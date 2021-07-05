@@ -6,7 +6,14 @@
     <div>
         <em>annotationtype:</em>
         <input type="radio" name="type" value="LINEDRAW">LineDraw
-        <input type="radio" name="type" value="FREEDRAW">FreeDraw<br>
+        <input type="radio" name="type" value="FREEDRAW">FreeDraw
+        <input type="radio" name="type" value="TEXT">Text<br>
+    </div>
+    <div>
+        <em>Text properties</em><br>
+        Text : <input type="text" id="annotationtext" value="test" ><br>
+        Font size (global): <input type="text" id="annotationfontsize" value="100" > %<br>
+
     </div>
     <hr>
     <div>
@@ -42,25 +49,25 @@
 </body>
 
 <script type="text/javascript" src="https://ajax.googleapis.com/ajax/libs/jquery/2.1.1/jquery.min.js"></script>
-<script type="text/javascript" src="../node_modules/openseadragon/build/openseadragon/openseadragon.js"></script>
+<script type="text/javascript" src="openseadragon.js"></script>
 <script type="text/javascript" src="../dist/openseadragon-annotations.js"></script>
 <script type="text/javascript" >
 $(document).ready(function() {
     const viewer = OpenSeadragon({
         id: 'viewer',
-        prefixUrl: "../node_modules/openseadragon/build/openseadragon/images/",
+        prefixUrl: "https://static.zoomhub.net/openseadragon-images/",
         showNavigator:  true,
         tileSources: {
             Image: {
                 xmlns: 'http://schemas.microsoft.com/deepzoom/2008',
-                Url: 'http://content.zoomhub.net/dzis/TDbz_files/',
+                Url: 'https://cache.zoomhub.net/content/WmcF_files/',
                 Format: 'jpg',
                 Overlap: 1,
                 TileSize: 254,
                 ServerFormat: 'Default',
                 Size: {
-                    Height: 4409,
-                    Width: 7793
+                    Height: 6429,
+                    Width: 11472
                 }
             }
         }
@@ -98,7 +105,13 @@ $(document).ready(function() {
             break;
         };
     });
-    
+    $('#annotationtext').change(function() {
+        annotations.setAnnotationText(document.getElementById("annotationtext").value);
+    });
+    $('#annotationfontsize').blur(function() {
+        annotations.setAnnotationFontsize(document.getElementById("annotationfontsize").value);
+    });
+
 });
 
 </script>

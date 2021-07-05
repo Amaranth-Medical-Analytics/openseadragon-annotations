@@ -6,10 +6,10 @@ class Overlay extends Component {
     // In Internet Explorer and Edge we can not rely on vector-effect="non-scaling-stroke"
     // to maintain constant the witdh of the SVG strokes during zoom
     const vectorEffectNotAvailable = document.documentElement.style.vectorEffect === undefined;
-    // Make sure only first 2 elements of array are used, later elements are used for name
-    const standardRender = (el) => h(...el.slice(0, 2));
+    // last element is used for name, remove it with slice
+    const standardRender = (el) => h(...el.slice(0, -1));
     const renderForIeAndEdge = (el, model) => {
-      const newEl = el.slice(0, 2);
+      const newEl = el.slice(0, -1);
       const baseWidth = 3;
       let percentWidth;
       const totalImageWidthInPixels = model.width * model.zoom;

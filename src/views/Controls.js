@@ -10,6 +10,11 @@ import drawfreeHover from '../../img/path_hover.png';
 import drawfreePressed from '../../img/path_pressed.png';
 import drawfreeRest from '../../img/path_rest.png';
 
+import textGroupHover from '../../img/text_grouphover.png';
+import textHover from '../../img/text_hover.png';
+import textPressed from '../../img/text_pressed.png';
+import textRest from '../../img/text_rest.png';
+
 import moveGroupHover from '../../img/move_grouphover.png';
 import moveHover from '../../img/move_hover.png';
 import movePressed from '../../img/move_pressed.png';
@@ -85,6 +90,20 @@ export class DrawFreeControl extends Control {
     });
   }
 }
+
+export class TextControl extends Control {
+  constructor(options) {
+    super({
+      Tooltip: 'Text',
+      srcRest: textRest,
+      srcGroup: textGroupHover,
+      srcHover: textHover,
+      srcDown: textPressed,
+      ...options,
+    });
+  }
+}
+
 export class MoveControl extends Control {
   constructor(options) {
     super({

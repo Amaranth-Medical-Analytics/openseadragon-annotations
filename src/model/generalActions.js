@@ -13,7 +13,7 @@ const reactToGeneralAction = (model) =>
         break;
 
       case 'PRESS':
-        if ((model.mode === 'LINEDRAW' || model.mode === 'FREEDRAW') && model.controlsactive) {
+        if ((model.mode === 'LINEDRAW' || model.mode === 'FREEDRAW' || model.mode === 'TEXT') && model.controlsactive && !model.activityInProgress) {
           // Remove existing annotation if it has same non-empty name
           if (model.annotationname !== '') {
             const i = model.getAnnotationsIdxByName(model.annotationname);
@@ -51,6 +51,19 @@ const reactToGeneralAction = (model) =>
                 }, `${model.annotationname}`,
               ]);
               break;
+            case 'TEXT':
+              model.annotations.push([
+                'text', 
+                {
+                  x: `${action.x}`,
+                  y: `${action.y}`,
+                  fill: `${model.annotationcolor}`,
+                  'font-family': 'sans-serif',
+                  'font-size': `${model.getCurrentFontsize()}`,
+                  'text-anchor': 'middle',
+                }, `${model.annotationtext}`,  `${model.annotationname}`,
+              ]);
+              break;
             default:
               break;
           }
@@ -59,20 +72,23 @@ const reactToGeneralAction = (model) =>
 
       case 'LEAVE_CANVAS':
       case 'RELEASE':
-        if ((model.mode === 'LINEDRAW' || model.mode === 'FREEDRAW') && model.activityInProgress === true) {
+        if ((model.mode === 'LINEDRAW' || model.mode === 'FREEDRAW' || model.mode === 'TEXT') && model.activityInProgress === true) {
           model.raiseEvent('ANNOTATIONRELEASE_EVENT', model.annotations[model.annotations.length - 1]);
           model.activityInProgress = false;
         }
         break;
 
       case 'MOVE':
-        if ((model.mode === 'LINEDRAW' || model.mode === 'FREEDRAW') && model.activityInProgress === true) {
+        if ((model.mode === 'LINEDRAW' || model.mode === 'FREEDRAW' || model.mode === 'TEXT') && model.activityInProgress === true) {
           const lastAnnotation = model.annotations[model.annotations.length - 1];
           if (lastAnnotation && lastAnnotation[0] === 'path') {
             lastAnnotation[1].d += ` L${action.x} ${action.y}`;
           } else if (lastAnnotation && lastAnnotation[0] === 'line') {
             lastAnnotation[1].x2 = `${action.x}`;
             lastAnnotation[1].y2 = `${action.y}`;
+          } else if (lastAnnotation && lastAnnotation[0] === 'text') {
+            lastAnnotation[1].x = `${action.x}`;
+            lastAnnotation[1].y = `${action.y}`;
           }
         }
         break;
@@ -84,6 +100,7 @@ const reactToGeneralAction = (model) =>
 
       case 'ZOOM_UPDATE':
         model.zoom = action.zoom;
+        model.zoomUpdate();
         break;
 
       case 'INITIALIZE':

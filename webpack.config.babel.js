@@ -36,7 +36,16 @@ module.exports = (env = {}) => {
     },
     module: {
       loaders: [
-        { test: /\.js$/, loader: 'babel-loader', exclude: /node_modules/ },
+        { 
+          test: /\.js$/, 
+          use: {
+            loader: 'babel-loader',
+            options: {
+              presets: []
+            }
+          }, 
+          exclude: [/node_modules/] 
+        },
         { test: /\.png$/, loader: 'url-loader' },
       ],
     },

@@ -1,24 +1,28 @@
 import { Rect } from 'OpenSeadragon';
 import { h, render } from 'preact';
 import Overlay from './views/Overlay';
-import { DrawLineControl, DrawFreeControl, MoveControl } from './views/Controls';
+import { DrawLineControl, DrawFreeControl, TextControl, MoveControl } from './views/Controls';
 import createDispatcher from './model/createDispatcher';
 import generalActions from './model/generalActions';
 import createModel from './model/createModel';
 
 const annotationsPrototype = {
   onOpen() {
-    this.overlay = render(h(Overlay, { dispatch: this.dispatch, model: this.model }));
     const homeBounds = this.viewer.world.getHomeBounds();
-    this.viewer.addOverlay(this.overlay, new Rect(0, 0, homeBounds.width, homeBounds.height));
     const zoom = this.viewer.viewport.getZoom();
+    this.overlay = render(h(Overlay, { dispatch: this.dispatch, model: this.model }));
+    this.viewer.addOverlay(this.overlay, new Rect(0, 0, homeBounds.width, homeBounds.height));
     const { width, height } = this.overlay.getBoundingClientRect();
     this.dispatch({ type: 'INITIALIZE', zoom, width, height });
-    this.controls = [
-      new MoveControl({ dispatch: this.dispatch, model: this.model, viewer: this.viewer }),
-      new DrawLineControl({ dispatch: this.dispatch, model: this.model, viewer: this.viewer }),
-      new DrawFreeControl({ dispatch: this.dispatch, model: this.model, viewer: this.viewer }),
-    ];
+    if (!this.controls) {
+      this.controls = [
+        new MoveControl({ dispatch: this.dispatch, model: this.model, viewer: this.viewer }),
+        new DrawLineControl({ dispatch: this.dispatch, model: this.model, viewer: this.viewer }),
+        new DrawFreeControl({ dispatch: this.dispatch, model: this.model, viewer: this.viewer }),
+        new TextControl({ dispatch: this.dispatch, model: this.model, viewer: this.viewer }),
+      ];
+    }
+    this.cleanAnnotations();
   },
 
   onClose() {
@@ -55,6 +59,15 @@ const annotationsPrototype = {
 
   setAnnotationName(name) {
     this.model.annotationname = name;
+  },
+
+  setAnnotationText(text) {
+    this.model.annotationtext = text;
+  },
+
+  setAnnotationFontsize(fontsize) {
+    this.model.annotationfontsize = parseFloat(fontsize);
+    this.model.zoomUpdate()
   },
 
   getStatus() {
