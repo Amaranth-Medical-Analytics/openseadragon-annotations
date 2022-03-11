@@ -92,8 +92,6 @@ const reactToGeneralAction = (model) =>
                       fill: 'none',
                       points: [ {'x': action.x, 'y': action.y} ],
                       d: `M${action.x} ${action.y}`,
-                      //lastPoint: {'x': action.x,'y': action.y},
-                      latestPoint: {},
                       stroke: `${model.annotationcolor}`,
                       'stroke-width': `${model.annotationlinewidth}`,
                       'stroke-linejoin': 'round',
@@ -114,7 +112,7 @@ const reactToGeneralAction = (model) =>
             console.log('In second + press case...');
             const lastAnnotation = model.annotations[model.annotations.length - 1];
             if (lastAnnotation && lastAnnotation[0] === 'path'){
-              lastAnnotation[1].points.push(lastAnnotation[1].latestPoint);
+              lastAnnotation[1].points.push({'x':action.x, 'y':action.y});
               lastAnnotation[1].d = create_svg_from_points(lastAnnotation[1].points);
             }
             console.log(`Added to path | Num clicks ${model.clicks}`);
@@ -156,11 +154,8 @@ const reactToGeneralAction = (model) =>
           if (lastAnnotation && lastAnnotation[0] === 'path' && model.mode === 'FREEDRAW'){
             lastAnnotation[1].d += ` L${action.x} ${action.y}`;
           } else if (lastAnnotation && lastAnnotation[0] === 'path' && model.mode === 'POLYDRAW'){
-            //lastAnnotation[1].d += ` L${action.x} ${action.y}`;
-            lastAnnotation[1].latestPoint = {'x': action.x, 'y': action.y};
-            
             lastAnnotation[1].points.pop();
-            lastAnnotation[1].points.push(lastAnnotation[1].latestPoint);
+            lastAnnotation[1].points.push({'x':action.x, 'y':action.y});
             lastAnnotation[1].d = create_svg_from_points(lastAnnotation[1].points);
           } else if (lastAnnotation && lastAnnotation[0] === 'line') {
             lastAnnotation[1].x2 = `${action.x}`;
