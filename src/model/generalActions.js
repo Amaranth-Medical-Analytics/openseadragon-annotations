@@ -135,6 +135,11 @@ const reactToGeneralAction = (model) =>
       case 'DOUBLE_CLICK':
         // End polygon process
         if ((model.mode === 'LINEDRAW' || model.mode === 'POLYDRAW') && model.activityInProgress === true) {
+          // Close polygon
+          const lastAnnotation = model.annotations[model.annotations.length - 1];
+          lastAnnotation[1].points.push(lastAnnotation[1].points[0]);
+          lastAnnotation[1].d = create_svg_from_points(lastAnnotation[1].points);
+        
           model.raiseEvent('ANNOTATIONRELEASE_EVENT', model.annotations[model.annotations.length - 1]);
           model.activityInProgress = false;
           model.clicks = 0;
