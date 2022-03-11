@@ -7,6 +7,7 @@ export default () =>
     zoom: 1,
     width: 0,
     height: 0,
+    clicks: 0,
     activityInProgress: false,
     annotations: [],
     annotationcolor: 'green',

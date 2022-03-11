@@ -78,6 +78,19 @@ export class DrawLineControl extends Control {
   }
 }
 
+export class DrawPolyControl extends Control {
+  constructor(options) {
+    super({
+      Tooltip: 'PolyDraw',
+      srcRest: drawlineRest,
+      srcGroup: drawlineGroupHover,
+      srcHover: drawlineHover,
+      srcDown: drawlinePressed,
+      ...options,
+    });
+  }
+}
+
 export class DrawFreeControl extends Control {
   constructor(options) {
     super({

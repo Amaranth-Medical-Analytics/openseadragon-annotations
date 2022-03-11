@@ -38,6 +38,13 @@ class Overlay extends Component {
     }
   };
 
+  onDblClick = (e) => {
+    if (this.handleMouseForAnnotation()) {
+      e.stopPropagation();
+      this.props.dispatch({ type: 'DOUBLE_CLICK', ...this.calculateCoords(e) });
+    }
+  };
+
   onMouseMove = (e) => {
     if (this.handleMouseForAnnotation()) {
       e.stopPropagation();
@@ -73,7 +80,7 @@ class Overlay extends Component {
   }
 
   render() {
-    const { onMouseDown, onMouseLeave, onMouseMove, onMouseUp } = this;
+    const { onMouseDown, onMouseLeave, onMouseMove, onMouseUp, onDblClick } = this;
     return h(
       'svg',
       {
@@ -91,6 +98,7 @@ class Overlay extends Component {
         onMouseLeave,
         onMouseMove,
         onMouseUp,
+        onDblClick,
         onPointerDown: onMouseDown,
         onPointerUp: onMouseUp,
       },
