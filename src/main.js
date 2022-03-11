@@ -19,7 +19,6 @@ const annotationsPrototype = {
         new MoveControl({ dispatch: this.dispatch, model: this.model, viewer: this.viewer }),
         new DrawPolyControl({ dispatch: this.dispatch, model: this.model, viewer: this.viewer }),
         new DrawFreeControl({ dispatch: this.dispatch, model: this.model, viewer: this.viewer }),
-        new TextControl({ dispatch: this.dispatch, model: this.model, viewer: this.viewer }),
       ];
     }
     this.cleanAnnotations();

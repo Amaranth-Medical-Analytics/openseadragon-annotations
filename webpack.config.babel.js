@@ -25,7 +25,7 @@ module.exports = (env = {}) => {
     entry: path.join(__dirname, 'src/main.js'),
     output: {
       path: path.resolve(__dirname, 'dist/'),
-      filename: 'openseadragon-annotations-test.js',
+      filename: 'openseadragon-annotations-poly.js',
       library: ['OpenSeadragon', 'Annotations'],
       libraryTarget: 'var',
       libraryExport: 'default',
