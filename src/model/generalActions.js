@@ -26,7 +26,7 @@ const reactToGeneralAction = (model) =>
 
       case 'PRESS':
         model.clicks ++;
-        console.log(model.clicks);
+        //console.log(model.clicks);
         if (model.controlsactive && model.activityInProgress === false){
           if (model.mode === 'LINEDRAW' 
                 || model.mode === 'FREEDRAW' 
@@ -85,7 +85,7 @@ const reactToGeneralAction = (model) =>
                 break;
               case 'POLYDRAW':
                 if (model.clicks === 1){
-                  console.log('Starting polygon...');
+                  //console.log('Starting polygon...');
                   model.annotations.push([
                     'path',
                     {
@@ -109,13 +109,11 @@ const reactToGeneralAction = (model) =>
           if (model.mode === 'POLYDRAW' 
               && model.clicks >= 2              // each click registers twice
               && model.clicks % 2 === 0){      // only consider one click
-            console.log('In second + press case...');
             const lastAnnotation = model.annotations[model.annotations.length - 1];
             if (lastAnnotation && lastAnnotation[0] === 'path'){
               lastAnnotation[1].points.push({'x':action.x, 'y':action.y});
               lastAnnotation[1].d = create_svg_from_points(lastAnnotation[1].points);
             }
-            console.log(`Added to path | Num clicks ${model.clicks}`);
           }
         }
         break;
