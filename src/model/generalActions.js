@@ -25,6 +25,7 @@ const reactToGeneralAction = (model) =>
         break;
 
       case 'PRESS':
+        // TO-DO : Map tp higher level in canvas_utils.js
         model.clicks ++;
         //console.log(model.clicks);
         if (model.controlsactive && model.activityInProgress === false){
