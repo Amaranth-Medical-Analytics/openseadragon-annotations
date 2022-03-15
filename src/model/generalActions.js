@@ -120,6 +120,10 @@ const reactToGeneralAction = (model) =>
         break;
 
       case 'LEAVE_CANVAS':
+        model.activityInProgress = false;
+        model.clicks = 0;
+        model.annotations.pop();
+        break;
       case 'RELEASE':
         // End linedraw, freedraw, text process
         if ((model.mode === 'FREEDRAW' || model.mode === 'TEXT') 
