@@ -76,7 +76,7 @@ class Overlay extends Component {
     const offsetY = e.clientY - rect.top;
     const x = (100 * offsetX) / rect.width;
     const y = (100 * offsetY) / rect.height;
-    return { x: Math.round(x * 100) / 100, y: Math.round(y * 100) / 100 };
+    return { x: x, y: y };
   }
 
   render() {
