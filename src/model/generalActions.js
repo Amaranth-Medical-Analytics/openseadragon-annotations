@@ -14,7 +14,14 @@ const reactToGeneralAction = (model) =>
   (action) => {
     switch (action.type) {
       case 'MODE_UPDATE':
-        model.activityInProgress = false;
+        if (model.activityInProgress === true){
+          if ((model.mode === 'FREEDRAW' || model.mode === 'POLYDRAW')){
+            model.clicks = 0;
+            model.annotations.pop();
+          }
+          model.activityInProgress = false;
+        }
+
         if (model.mode !== action.mode) {
           model.mode = action.mode;
         }
@@ -129,27 +136,31 @@ const reactToGeneralAction = (model) =>
         break;
       case 'RELEASE':
         // End linedraw, freedraw, text process
-        if ((model.mode === 'FREEDRAW' || model.mode === 'TEXT') 
+        if ((model.mode === 'FREEDRAW') 
             && model.activityInProgress === true) {
-          model.raiseEvent('ANNOTATIONRELEASE_EVENT', model.annotations[model.annotations.length - 1]);
+          // Close annotation
+          const lastAnnotation = model.annotations[model.annotations.length - 1];
+          lastAnnotation[1].d += ` Z`;
+          
           model.activityInProgress = false;
           model.clicks = 0;
+          model.raiseEvent('ANNOTATIONRELEASE_EVENT', model.annotations[model.annotations.length - 1]);
         }
         break;
       case 'DOUBLE_CLICK':
         // End polygon process
-        if ((model.mode === 'LINEDRAW' || model.mode === 'POLYDRAW') && model.activityInProgress === true) {
+        if (( model.mode === 'POLYDRAW') && model.activityInProgress === true) {
           // Close polygon
           const lastAnnotation = model.annotations[model.annotations.length - 1];
           lastAnnotation[1].points.push(lastAnnotation[1].points[0]);
           lastAnnotation[1].d = create_svg_from_points(lastAnnotation[1].points);
         
-          model.raiseEvent('ANNOTATIONRELEASE_EVENT', model.annotations[model.annotations.length - 1]);
           model.activityInProgress = false;
           model.clicks = 0;
+          model.raiseEvent('ANNOTATIONRELEASE_EVENT', model.annotations[model.annotations.length - 1]);
         }
         break;
-
+        
       case 'MOVE':
         if ((model.mode === 'LINEDRAW' 
               || model.mode === 'FREEDRAW' 
@@ -172,7 +183,7 @@ const reactToGeneralAction = (model) =>
           }
         }
         break;
-
+      
       case 'ANNOTATIONS_RESET':
         model.activityInProgress = false;
         model.annotations = action.annotations || [];
