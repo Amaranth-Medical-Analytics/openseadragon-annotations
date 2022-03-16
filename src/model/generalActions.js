@@ -1,4 +1,4 @@
-function create_svg_from_points(points){
+function createSvgFromPoints(points){
   var path = null;
   for (var i=0; i<points.length; i++){
     if (i === 0){
@@ -9,6 +9,15 @@ function create_svg_from_points(points){
   }
   return path;
 }
+
+function pointDistance(start,end) {
+  let distance = 0;
+  const dx = (end.x - start.x);
+  const dy = (end.y - start.y);
+  distance = Math.sqrt((dx * dx) + (dy * dy)) * viewer.viewport.getZoom();
+  return distance;
+}
+
 
 const reactToGeneralAction = (model) =>
   (action) => {
@@ -117,10 +126,25 @@ const reactToGeneralAction = (model) =>
           if (model.mode === 'POLYDRAW' 
               && model.clicks >= 2              // each click registers twice
               && model.clicks % 2 === 0){      // only consider one click
+            console.log(model.clicks);
             const lastAnnotation = model.annotations[model.annotations.length - 1];
+            console.log(lastAnnotation);
+
             if (lastAnnotation && lastAnnotation[0] === 'path'){
-              lastAnnotation[1].points.push({'x':action.x, 'y':action.y});
-              lastAnnotation[1].d = create_svg_from_points(lastAnnotation[1].points);
+              const distanceToStart = pointDistance(lastAnnotation[1].points[0], {'x':action.x,'y':action.y})
+              if (distanceToStart < 1.3 && lastAnnotation[1].points.length > 1){
+                // Remove duplicate held to visualise MOVE
+                lastAnnotation[1].points.pop();
+                lastAnnotation[1].d = createSvgFromPoints(lastAnnotation[1].points);
+                lastAnnotation[1].d += ' Z';
+                model.activityInProgress = false;
+                model.clicks = 0;
+                model.raiseEvent('ANNOTATIONRELEASE_EVENT', model.annotations[model.annotations.length - 1]);
+                console.log('Done with poly');
+              } else {
+                lastAnnotation[1].points.push({'x':action.x, 'y':action.y});
+                lastAnnotation[1].d = createSvgFromPoints(lastAnnotation[1].points);
+              }
             }
           }
         }
@@ -147,33 +171,21 @@ const reactToGeneralAction = (model) =>
           model.raiseEvent('ANNOTATIONRELEASE_EVENT', model.annotations[model.annotations.length - 1]);
         }
         break;
-      case 'DOUBLE_CLICK':
-        // End polygon process
-        if (( model.mode === 'POLYDRAW') && model.activityInProgress === true) {
-          // Close polygon
-          const lastAnnotation = model.annotations[model.annotations.length - 1];
-          lastAnnotation[1].points.push(lastAnnotation[1].points[0]);
-          lastAnnotation[1].d = create_svg_from_points(lastAnnotation[1].points);
-        
-          model.activityInProgress = false;
-          model.clicks = 0;
-          model.raiseEvent('ANNOTATIONRELEASE_EVENT', model.annotations[model.annotations.length - 1]);
-        }
-        break;
-        
       case 'MOVE':
         if ((model.mode === 'LINEDRAW' 
               || model.mode === 'FREEDRAW' 
               || model.mode === 'POLYDRAW'
               || model.mode === 'TEXT') 
               && model.activityInProgress === true) {
-          const lastAnnotation = model.annotations[model.annotations.length - 1];
+          const lastAnnotation = model.annotations[model.annotations.length - 1];      
           if (lastAnnotation && lastAnnotation[0] === 'path' && model.mode === 'FREEDRAW'){
             lastAnnotation[1].d += ` L${action.x} ${action.y}`;
           } else if (lastAnnotation && lastAnnotation[0] === 'path' && model.mode === 'POLYDRAW'){
+            // In first move, removes current duplicate + all duplicates while moving
             lastAnnotation[1].points.pop();
+            // Creates the duplicate - remove on END
             lastAnnotation[1].points.push({'x':action.x, 'y':action.y});
-            lastAnnotation[1].d = create_svg_from_points(lastAnnotation[1].points);
+            lastAnnotation[1].d = createSvgFromPoints(lastAnnotation[1].points);
           } else if (lastAnnotation && lastAnnotation[0] === 'line') {
             lastAnnotation[1].x2 = `${action.x}`;
             lastAnnotation[1].y2 = `${action.y}`;
