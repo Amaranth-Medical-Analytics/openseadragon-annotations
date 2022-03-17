@@ -148,7 +148,6 @@ const reactToGeneralAction = (model) =>
 
             if (lastAnnotation && lastAnnotation[0] === 'path'){
               const distanceToStart = pointDistance(lastAnnotation[1].points[0], {'x':action.x,'y':action.y})
-              const threshold = 1.5 // percent of viewport
               if (distanceToStart < threshold && lastAnnotation[1].points.length > 1){
                 // Remove duplicate held to visualise MOVE
                 lastAnnotation[1].points.pop();
@@ -208,7 +207,6 @@ const reactToGeneralAction = (model) =>
             lastAnnotation[1].d = createSvgFromPoints(lastAnnotation[1].points);
 
             const distanceToStart = pointDistance(lastAnnotation[1].points[0], {'x':action.x,'y':action.y})
-            const threshold = 1.5 // percent of viewport
             if (distanceToStart < threshold && lastAnnotation[1].points.length > 1){
               // Keep cleaning overlays on move to maintain opacity
               d3.select(viewer.svgOverlay().node()).selectAll("*").remove();
@@ -233,6 +231,14 @@ const reactToGeneralAction = (model) =>
         break;
 
       case 'ZOOM_UPDATE':
+        if (model.activityInProgress === true){
+          if ((model.mode === 'FREEDRAW' || model.mode === 'POLYDRAW')){
+            model.clicks = 0;
+            model.annotations.pop();
+          }
+          model.activityInProgress = false;
+        }
+
         model.zoom = action.zoom;
         model.zoomUpdate();
         break;
