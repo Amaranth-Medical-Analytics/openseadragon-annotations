@@ -18,27 +18,8 @@ function pointDistance(start,end){
   return distance;
 }
 
-function createCircleOverlay(x, y, threshold){
-  const content_size = viewer.world._contentSize;
-  const asp_ratio = content_size.y/content_size.x;
-
-  let overlay = viewer.svgOverlay();
-  
-  // Keep annotations in focus, disable overlay click events
-  overlay.node().parentNode.style.pointerEvents = 'none';
-  
-  // Define and render SVG circle
-  let d3Circle = d3.select(overlay.node()).append("circle")
-    .style('fill', '#f00')
-    .attr("cx", x / 100)
-    .attr("cy", y*asp_ratio / 100)
-    .attr("r", threshold / (100*viewer.viewport.getZoom()))
-    .style("opacity", 0.5);
-}
-
 const reactToGeneralAction = (model) =>
   (action) => {
-    const threshold = 1.5;
     switch (action.type) {
       case 'MODE_UPDATE':
         if (model.activityInProgress === true){
@@ -132,8 +113,6 @@ const reactToGeneralAction = (model) =>
                       'vector-effect': 'non-scaling-stroke',
                     }, `${model.annotationname}`,
                   ]);
-                  d3.select(viewer.svgOverlay().node()).selectAll("*").remove();
-                  createCircleOverlay(action.x, action.y, threshold);
                 }
                 break;
               default:
@@ -222,7 +201,22 @@ const reactToGeneralAction = (model) =>
             if (distanceToStart < threshold && lastAnnotation[1].points.length > 1){
               // Keep cleaning overlays on move to maintain opacity
               d3.select(viewer.svgOverlay().node()).selectAll("*").remove();
-              createCircleOverlay(lastAnnotation[1].points[0].x, lastAnnotation[1].points[0].y, threshold);
+
+              const content_size = viewer.world._contentSize;
+              const asp_ratio = content_size.y/content_size.x;
+
+              let overlay = viewer.svgOverlay();
+              
+              // Keep annotations in focus, disable overlay click events
+              overlay.node().parentNode.style.pointerEvents = 'none';
+              
+              // Define and render SVG circle
+              let d3Circle = d3.select(overlay.node()).append("circle")
+                .style('fill', '#f00')
+                .attr("cx", lastAnnotation[1].points[0].x / 100)
+                .attr("cy", lastAnnotation[1].points[0].y*asp_ratio / 100)
+                .attr("r", threshold / (100*viewer.viewport.getZoom()))
+                .style("opacity", 0.5);
             } else {
               d3.select(viewer.svgOverlay().node()).selectAll("*").remove();
             }
