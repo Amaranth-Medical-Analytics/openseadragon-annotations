@@ -140,34 +140,7 @@ const reactToGeneralAction = (model) =>
                 break;
             }
           }
-        } else if (model.controlsactive && model.activityInProgress === true){
-          if (model.mode === 'POLYDRAW' 
-              && model.clicks >= 2             // each click registers twice
-              && model.clicks % 2 === 0){      // only consider one click
-            const lastAnnotation = model.annotations[model.annotations.length - 1];
-
-            if (lastAnnotation && lastAnnotation[0] === 'path'){
-              const distanceToStart = pointDistance(lastAnnotation[1].points[0], {'x':action.x,'y':action.y})
-              const threshold = 1.5 // percent of viewport
-              if (distanceToStart < threshold && lastAnnotation[1].points.length > 1){
-                // Remove duplicate held to visualise MOVE
-                lastAnnotation[1].points.pop();
-                lastAnnotation[1].d = createSvgFromPoints(lastAnnotation[1].points);
-                lastAnnotation[1].d += ' Z';
-                
-                // Close overlay
-                d3.select(viewer.svgOverlay().node()).selectAll("*").remove();
-                
-                model.activityInProgress = false;
-                model.clicks = 0;
-                model.raiseEvent('ANNOTATIONRELEASE_EVENT', model.annotations[model.annotations.length - 1]);
-              } else {
-                lastAnnotation[1].points.push({'x':action.x, 'y':action.y});
-                lastAnnotation[1].d = createSvgFromPoints(lastAnnotation[1].points);
-              }
-            }
-          }
-        }
+        } 
         break;
 
       case 'LEAVE_CANVAS':
@@ -178,9 +151,10 @@ const reactToGeneralAction = (model) =>
           model.annotations.pop();
         }
         break;
+
       case 'RELEASE':
         // End linedraw, freedraw, text process
-        if ((model.mode === 'FREEDRAW') 
+        if (model.mode === 'FREEDRAW'
             && model.activityInProgress === true) {
           // Close annotation
           const lastAnnotation = model.annotations[model.annotations.length - 1];
@@ -189,8 +163,42 @@ const reactToGeneralAction = (model) =>
           model.activityInProgress = false;
           model.clicks = 0;
           model.raiseEvent('ANNOTATIONRELEASE_EVENT', model.annotations[model.annotations.length - 1]);
-        }
+        } 
+        // Capture polydraw if not at threshold
+        // End if in threshold
+        else if (model.mode === 'POLYDRAW' 
+              && model.activityInProgress === true
+              && model.clicks % 2 === 0){
+            const lastAnnotation = model.annotations[model.annotations.length - 1];
+            // If clicks > 2, second point has been registered
+            if (model.clicks > 2){    
+              if (lastAnnotation && lastAnnotation[0] === 'path'){
+                const distanceToStart = pointDistance(lastAnnotation[1].points[0], {'x':action.x,'y':action.y})
+                if (distanceToStart < threshold && lastAnnotation[1].points.length > 1){
+                  // Remove duplicate held to visualise MOVE
+                  lastAnnotation[1].points.pop();
+                  lastAnnotation[1].d = createSvgFromPoints(lastAnnotation[1].points);
+                  lastAnnotation[1].d += ' Z';
+                  
+                  // Close overlay
+                  d3.select(viewer.svgOverlay().node()).selectAll("*").remove();
+                  
+                  model.activityInProgress = false;
+                  model.clicks = 0;
+                  model.raiseEvent('ANNOTATIONRELEASE_EVENT', model.annotations[model.annotations.length - 1]);
+                } else {
+                  lastAnnotation[1].points.push({'x':action.x, 'y':action.y});
+                  lastAnnotation[1].d = createSvgFromPoints(lastAnnotation[1].points);
+                }
+              }
+            } else {
+              // Only one point exists, add second point
+              lastAnnotation[1].points.push({'x':action.x, 'y':action.y});
+              lastAnnotation[1].d = createSvgFromPoints(lastAnnotation[1].points);
+            }
+          }
         break;
+
       case 'MOVE':
         if ((model.mode === 'LINEDRAW' 
               || model.mode === 'FREEDRAW' 
@@ -201,14 +209,16 @@ const reactToGeneralAction = (model) =>
           if (lastAnnotation && lastAnnotation[0] === 'path' && model.mode === 'FREEDRAW'){
             lastAnnotation[1].d += ` L${action.x} ${action.y}`;
           } else if (lastAnnotation && lastAnnotation[0] === 'path' && model.mode === 'POLYDRAW'){
-            // In first move, removes current duplicate + all duplicates made while moving
-            lastAnnotation[1].points.pop();
+            if (lastAnnotation[1].points.length > 1){
+              // In first move, removes current duplicate + all duplicates made while moving
+              // Don't remove if only one point exists
+              lastAnnotation[1].points.pop();
+            }
             // Creates the duplicate, will remove at end of move - remove on click
             lastAnnotation[1].points.push({'x':action.x, 'y':action.y});
             lastAnnotation[1].d = createSvgFromPoints(lastAnnotation[1].points);
 
             const distanceToStart = pointDistance(lastAnnotation[1].points[0], {'x':action.x,'y':action.y})
-            const threshold = 1.5 // percent of viewport
             if (distanceToStart < threshold && lastAnnotation[1].points.length > 1){
               // Keep cleaning overlays on move to maintain opacity
               d3.select(viewer.svgOverlay().node()).selectAll("*").remove();

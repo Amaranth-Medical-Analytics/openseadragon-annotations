@@ -55,7 +55,7 @@ class Overlay extends Component {
   onMouseUp = (e) => {
     if (this.handleMouseForAnnotation()) {
       e.stopPropagation();
-      this.props.dispatch({ type: 'RELEASE' });
+      this.props.dispatch({ type: 'RELEASE', ...this.calculateCoords(e) });
     }
   };
 
