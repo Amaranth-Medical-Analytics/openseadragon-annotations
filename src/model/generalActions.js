@@ -10,14 +10,13 @@ function createSvgFromPoints(points){
   return path;
 }
 
-function pointDistance(start,end) {
+function pointDistance(start,end){
   let distance = 0;
   const dx = (end.x - start.x);
   const dy = (end.y - start.y);
   distance = Math.sqrt((dx * dx) + (dy * dy)) * viewer.viewport.getZoom();
   return distance;
 }
-
 
 const reactToGeneralAction = (model) =>
   (action) => {
@@ -43,7 +42,6 @@ const reactToGeneralAction = (model) =>
       case 'PRESS':
         // TO-DO : Map tp higher level in canvas_utils.js
         model.clicks ++;
-        //console.log(model.clicks);
         if (model.controlsactive && model.activityInProgress === false){
           if (model.mode === 'LINEDRAW' 
                 || model.mode === 'FREEDRAW' 
@@ -102,7 +100,6 @@ const reactToGeneralAction = (model) =>
                 break;
               case 'POLYDRAW':
                 if (model.clicks === 1){
-                  //console.log('Starting polygon...');
                   model.annotations.push([
                     'path',
                     {
@@ -124,23 +121,25 @@ const reactToGeneralAction = (model) =>
           }
         } else if (model.controlsactive && model.activityInProgress === true){
           if (model.mode === 'POLYDRAW' 
-              && model.clicks >= 2              // each click registers twice
+              && model.clicks >= 2             // each click registers twice
               && model.clicks % 2 === 0){      // only consider one click
-            console.log(model.clicks);
             const lastAnnotation = model.annotations[model.annotations.length - 1];
-            console.log(lastAnnotation);
 
             if (lastAnnotation && lastAnnotation[0] === 'path'){
               const distanceToStart = pointDistance(lastAnnotation[1].points[0], {'x':action.x,'y':action.y})
-              if (distanceToStart < 1.3 && lastAnnotation[1].points.length > 1){
+              const threshold = 1.5 // percent of viewport
+              if (distanceToStart < threshold && lastAnnotation[1].points.length > 1){
                 // Remove duplicate held to visualise MOVE
                 lastAnnotation[1].points.pop();
                 lastAnnotation[1].d = createSvgFromPoints(lastAnnotation[1].points);
                 lastAnnotation[1].d += ' Z';
+                
+                // Close overlay
+                d3.select(viewer.svgOverlay().node()).selectAll("*").remove();
+                
                 model.activityInProgress = false;
                 model.clicks = 0;
                 model.raiseEvent('ANNOTATIONRELEASE_EVENT', model.annotations[model.annotations.length - 1]);
-                console.log('Done with poly');
               } else {
                 lastAnnotation[1].points.push({'x':action.x, 'y':action.y});
                 lastAnnotation[1].d = createSvgFromPoints(lastAnnotation[1].points);
@@ -181,11 +180,37 @@ const reactToGeneralAction = (model) =>
           if (lastAnnotation && lastAnnotation[0] === 'path' && model.mode === 'FREEDRAW'){
             lastAnnotation[1].d += ` L${action.x} ${action.y}`;
           } else if (lastAnnotation && lastAnnotation[0] === 'path' && model.mode === 'POLYDRAW'){
-            // In first move, removes current duplicate + all duplicates while moving
+            // In first move, removes current duplicate + all duplicates made while moving
             lastAnnotation[1].points.pop();
-            // Creates the duplicate - remove on END
+            // Creates the duplicate, will remove at end of move - remove on click
             lastAnnotation[1].points.push({'x':action.x, 'y':action.y});
             lastAnnotation[1].d = createSvgFromPoints(lastAnnotation[1].points);
+
+            const distanceToStart = pointDistance(lastAnnotation[1].points[0], {'x':action.x,'y':action.y})
+            const threshold = 1.5 // percent of viewport
+            if (distanceToStart < threshold && lastAnnotation[1].points.length > 1){
+              // Keep cleaning overlays on move to maintain opacity
+              d3.select(viewer.svgOverlay().node()).selectAll("*").remove();
+
+              const content_size = viewer.world._contentSize;
+              const asp_ratio = content_size.y/content_size.x;
+
+              let overlay = viewer.svgOverlay();
+              
+              // Keep annotations in focus, disable overlay click events
+              overlay.node().parentNode.style.pointerEvents = 'none';
+              
+              // Define and render SVG circle
+              let d3Circle = d3.select(overlay.node()).append("circle")
+                .style('fill', '#f00')
+                .attr("cx", lastAnnotation[1].points[0].x / 100)
+                .attr("cy", lastAnnotation[1].points[0].y*asp_ratio / 100)
+                .attr("r", threshold / (100*viewer.viewport.getZoom()))
+                .style("opacity", 0.5);
+            } else {
+              d3.select(viewer.svgOverlay().node()).selectAll("*").remove();
+            }
+
           } else if (lastAnnotation && lastAnnotation[0] === 'line') {
             lastAnnotation[1].x2 = `${action.x}`;
             lastAnnotation[1].y2 = `${action.y}`;
