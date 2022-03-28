@@ -65,6 +65,7 @@ const reactToGeneralAction = (model) =>
           if (model.mode === 'LINEDRAW' 
                 || model.mode === 'FREEDRAW' 
                 || model.mode === 'POLYDRAW'
+                || model.mode === 'RECTANGLE'
                 || model.mode === 'TEXT'){
             // Remove existing annotation if it has same non-empty name
             if (model.annotationname !== '') {
@@ -136,6 +137,24 @@ const reactToGeneralAction = (model) =>
                   createCircleOverlay(action.x, action.y, threshold);
                 }
                 break;
+              case 'RECTANGLE':
+                if (model.clicks === 1){
+                  model.annotations.push([
+                    'path',
+                    {
+                      fill: 'none',
+                      points: [],
+                      start: {'x':action.x, 'y':action.y},
+                      d: `M${action.x} ${action.y}`,
+                      stroke: `${model.annotationcolor}`,
+                      'stroke-width': `${model.annotationlinewidth}`,
+                      'stroke-linejoin': 'round',
+                      'stroke-linecap': 'round',
+                      'vector-effect': 'non-scaling-stroke',
+                    }, `${model.annotationname}`,
+                  ]);
+                }
+                break;
               default:
                 break;
             }
@@ -170,35 +189,40 @@ const reactToGeneralAction = (model) =>
         break;
 
       case 'LEAVE_CANVAS':
-        if ((model.mode === 'FREEDRAW' || model.mode === 'POLYDRAW') 
+        if ((model.mode === 'FREEDRAW' || model.mode === 'POLYDRAW' || model.mode === 'RECTANGLE') 
             && model.activityInProgress === true){
           model.activityInProgress = false;
           model.clicks = 0;
           model.annotations.pop();
         }
         break;
+      
       case 'RELEASE':
         // End linedraw, freedraw, text process
-        if ((model.mode === 'FREEDRAW') 
-            && model.activityInProgress === true) {
-          // Close annotation
-          const lastAnnotation = model.annotations[model.annotations.length - 1];
-          lastAnnotation[1].d += ` Z`;
-          
+        if ((model.mode === 'FREEDRAW' || model.mode === 'RECTANGLE') 
+            && model.activityInProgress === true){
+          // Close freedraw annotation
+          if (model.mode === 'FREEDRAW' ) {
+            const lastAnnotation = model.annotations[model.annotations.length - 1];
+            lastAnnotation[1].d += ` Z`;
+          }
           model.activityInProgress = false;
           model.clicks = 0;
           model.raiseEvent('ANNOTATIONRELEASE_EVENT', model.annotations[model.annotations.length - 1]);
         }
         break;
+      
       case 'MOVE':
         if ((model.mode === 'LINEDRAW' 
               || model.mode === 'FREEDRAW' 
               || model.mode === 'POLYDRAW'
+              || model.mode === 'RECTANGLE'
               || model.mode === 'TEXT') 
               && model.activityInProgress === true) {
           const lastAnnotation = model.annotations[model.annotations.length - 1];      
           if (lastAnnotation && lastAnnotation[0] === 'path' && model.mode === 'FREEDRAW'){
             lastAnnotation[1].d += ` L${action.x} ${action.y}`;
+          
           } else if (lastAnnotation && lastAnnotation[0] === 'path' && model.mode === 'POLYDRAW'){
             // In first move, removes current duplicate + all duplicates made while moving
             lastAnnotation[1].points.pop();
@@ -215,9 +239,20 @@ const reactToGeneralAction = (model) =>
               d3.select(viewer.svgOverlay().node()).selectAll("*").remove();
             }
 
+          } else if (lastAnnotation && lastAnnotation[0] === 'path' && model.mode === 'RECTANGLE'){
+            let first_point = lastAnnotation[1].start;
+            let third_point = {'x':action.x,'y':action.y};
+            lastAnnotation[1].points = [first_point,
+                                        {'x':first_point.x ,'y':third_point.y},
+                                        third_point,
+                                        {'x':third_point.x ,'y':first_point.y}]
+            lastAnnotation[1].d = createSvgFromPoints(lastAnnotation[1].points);
+            lastAnnotation[1].d += ` Z`;
+          
           } else if (lastAnnotation && lastAnnotation[0] === 'line') {
             lastAnnotation[1].x2 = `${action.x}`;
             lastAnnotation[1].y2 = `${action.y}`;
+          
           } else if (lastAnnotation && lastAnnotation[0] === 'text') {
             lastAnnotation[1].x = `${action.x}`;
             lastAnnotation[1].y = `${action.y}`;
