@@ -10,6 +10,11 @@ import drawfreeHover from '../../img/path_hover.png';
 import drawfreePressed from '../../img/path_pressed.png';
 import drawfreeRest from '../../img/path_rest.png';
 
+import drawRectGroupHover from '../../img/rect_grouphover.png';
+import drawRectHover from '../../img/rect_hover.png';
+import drawRectPressed from '../../img/rect_pressed.png';
+import drawRectRest from '../../img/rect_rest.png';
+
 import textGroupHover from '../../img/text_grouphover.png';
 import textHover from '../../img/text_hover.png';
 import textPressed from '../../img/text_pressed.png';
@@ -86,6 +91,19 @@ export class DrawPolyControl extends Control {
       srcGroup: drawlineGroupHover,
       srcHover: drawlineHover,
       srcDown: drawlinePressed,
+      ...options,
+    });
+  }
+}
+
+export class DrawRectControl extends Control {
+  constructor(options) {
+    super({
+      Tooltip: 'Rectangle',
+      srcRest: drawRectRest,
+      srcGroup: drawRectGroupHover,
+      srcHover: drawRectHover,
+      srcDown: drawRectPressed,
       ...options,
     });
   }
