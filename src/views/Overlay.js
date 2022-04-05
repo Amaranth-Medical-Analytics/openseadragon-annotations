@@ -67,7 +67,10 @@ class Overlay extends Component {
   };
 
   handleMouseForAnnotation() {
-    return this.state.mode !== 'MOVE' && this.props.model.controlsactive;
+    return (this.state.mode !== 'MOVE'
+            && this.state.mode !== 'EDITBRUSH'
+            && this.state.mode !== 'DELETEBIN') 
+          && this.props.model.controlsactive;
   }
 
   calculateCoords(e) {

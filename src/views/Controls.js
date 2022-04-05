@@ -135,7 +135,7 @@ export class EditBrushControl extends Control {
   }
 }
 
-export class DeleteBin extends Control {
+export class DeleteBinControl extends Control {
   constructor(options) {
     super({
       Tooltip: 'DeleteBin',
