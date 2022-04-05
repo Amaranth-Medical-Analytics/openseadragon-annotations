@@ -122,10 +122,10 @@ export class DrawFreeControl extends Control {
   }
 }
 
-export class EditControl extends Control {
+export class EditBrushControl extends Control {
   constructor(options) {
     super({
-      Tooltip: 'Edit',
+      Tooltip: 'EditBrush',
       srcRest: drawlineRest,
       srcGroup: drawlineGroupHover,
       srcHover: drawlineHover,
@@ -135,10 +135,10 @@ export class EditControl extends Control {
   }
 }
 
-export class DeleteControl extends Control {
+export class DeleteBin extends Control {
   constructor(options) {
     super({
-      Tooltip: 'Delete',
+      Tooltip: 'DeleteBin',
       srcRest: drawlineRest,
       srcGroup: drawlineGroupHover,
       srcHover: drawlineHover,

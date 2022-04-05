@@ -1,7 +1,7 @@
 import { Rect } from 'OpenSeadragon';
 import { h, render } from 'preact';
 import Overlay from './views/Overlay';
-import { DeleteControl, DrawFreeControl, DrawPolyControl, DrawRectControl, EditControl, MoveControl } from './views/Controls';
+import { DeleteBin, DrawFreeControl, DrawPolyControl, DrawRectControl, EditBrush, MoveControl } from './views/Controls';
 import createDispatcher from './model/createDispatcher';
 import generalActions from './model/generalActions';
 import createModel from './model/createModel';
@@ -20,8 +20,8 @@ const annotationsPrototype = {
         new DrawPolyControl({ dispatch: this.dispatch, model: this.model, viewer: this.viewer }),
         new DrawFreeControl({ dispatch: this.dispatch, model: this.model, viewer: this.viewer }),
         new DrawRectControl({ dispatch: this.dispatch, model: this.model, viewer: this.viewer }),
-        new EditControl({ dispatch: this.dispatch, model: this.model, viewer: this.viewer }),
-        new DeleteControl({ dispatch: this.dispatch, model: this.model, viewer: this.viewer })
+        new EditBrush({ dispatch: this.dispatch, model: this.model, viewer: this.viewer }),
+        new DeleteBin({ dispatch: this.dispatch, model: this.model, viewer: this.viewer })
       ];
     }
     this.cleanAnnotations();

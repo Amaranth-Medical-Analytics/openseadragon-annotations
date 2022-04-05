@@ -62,30 +62,6 @@ const reactToGeneralAction = (model) =>
         // TO-DO : Map tp higher level in canvas_utils.js
         model.clicks ++;
         if (model.controlsactive && model.activityInProgress === false){
-          if ((model.mode === 'EDIT' || model.mode === 'DELETE')
-            && model.clicks === 2){
-            // Create point in viewport co-ordinates
-            const content_size = viewer.world._contentSize;
-            const asp_ratio = content_size.y/content_size.x;
-            
-            let viewportpoint = new OpenSeadragon.Point(action.x / 100, action.y*asp_ratio / 100)
-            let viewerpoint = viewer.viewport.viewportToViewerElementCoordinates(viewportpoint);
-            let event = {position: viewerpoint};
-            model.clicks = 0;
-            switch (model.mode) {
-              case 'EDIT':
-                event.source = 'edit';
-                model.raiseEvent('ANNOTATION_UPDATE_EVENT', event);
-                break;
-              case 'DELETE':
-                event.source = 'delete';
-                model.raiseEvent('ANNOTATION_UPDATE_EVENT', event);
-                break;
-              default:
-                break;
-            }
-          }
-
           if (model.mode === 'LINEDRAW' 
                 || model.mode === 'FREEDRAW' 
                 || model.mode === 'POLYDRAW'
