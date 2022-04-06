@@ -122,6 +122,32 @@ export class DrawFreeControl extends Control {
   }
 }
 
+export class EditBrushControl extends Control {
+  constructor(options) {
+    super({
+      Tooltip: 'EditBrush',
+      srcRest: drawlineRest,
+      srcGroup: drawlineGroupHover,
+      srcHover: drawlineHover,
+      srcDown: drawlinePressed,
+      ...options,
+    });
+  }
+}
+
+export class DeleteBinControl extends Control {
+  constructor(options) {
+    super({
+      Tooltip: 'DeleteBin',
+      srcRest: drawlineRest,
+      srcGroup: drawlineGroupHover,
+      srcHover: drawlineHover,
+      srcDown: drawlinePressed,
+      ...options,
+    });
+  }
+}
+
 export class TextControl extends Control {
   constructor(options) {
     super({

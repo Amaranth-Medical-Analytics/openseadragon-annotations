@@ -65,9 +65,18 @@ class Overlay extends Component {
       this.props.dispatch({ type: 'LEAVE_CANVAS' });
     }
   };
-
+  
+  /*
+    For MOVE, EDITBRUSH and DELETEBIN, UI left click handling is deferred to OSD
+    and not used by the annotation engine. Annotations does not intercept mouse click
+    events, enables right click handler from OSD.
+    Enables fast edit/delete from OSD handler
+  */
   handleMouseForAnnotation() {
-    return this.state.mode !== 'MOVE' && this.props.model.controlsactive;
+    return (this.state.mode !== 'MOVE'
+            && this.state.mode !== 'EDITBRUSH'
+            && this.state.mode !== 'DELETEBIN') 
+          && this.props.model.controlsactive;
   }
 
   calculateCoords(e) {
