@@ -15,6 +15,21 @@ import drawRectHover from '../../img/rect_hover.png';
 import drawRectPressed from '../../img/rect_pressed.png';
 import drawRectRest from '../../img/rect_rest.png';
 
+import drawPolyGroupHover from '../../img/polygon_grouphover.png';
+import drawPolyHover from '../../img/polygon_hover.png';
+import drawPolyPressed from '../../img/polygon_pressed.png';
+import drawPolyRest from '../../img/polygon_rest.png';
+
+import editBrushGroupHover from '../../img/brush_grouphover.png';
+import editBrushHover from '../../img/brush_hover.png';
+import editBrushPressed from '../../img/brush_pressed.png';
+import editBrushRest from '../../img/brush_rest.png';
+
+import deleteBinGroupHover from '../../img/bin_grouphover.png';
+import deleteBinHover from '../../img/bin_hover.png';
+import deleteBinPressed from '../../img/bin_pressed.png';
+import deleteBinRest from '../../img/bin_rest.png';
+
 import textGroupHover from '../../img/text_grouphover.png';
 import textHover from '../../img/text_hover.png';
 import textPressed from '../../img/text_pressed.png';
@@ -87,10 +102,10 @@ export class DrawPolyControl extends Control {
   constructor(options) {
     super({
       Tooltip: 'PolyDraw',
-      srcRest: drawlineRest,
-      srcGroup: drawlineGroupHover,
-      srcHover: drawlineHover,
-      srcDown: drawlinePressed,
+      srcRest: drawPolyRest,
+      srcGroup: drawPolyGroupHover,
+      srcHover: drawPolyHover,
+      srcDown: drawPolyPressed,
       ...options,
     });
   }
@@ -126,10 +141,10 @@ export class EditBrushControl extends Control {
   constructor(options) {
     super({
       Tooltip: 'EditBrush',
-      srcRest: drawlineRest,
-      srcGroup: drawlineGroupHover,
-      srcHover: drawlineHover,
-      srcDown: drawlinePressed,
+      srcRest: editBrushRest,
+      srcGroup: editBrushGroupHover,
+      srcHover: editBrushHover,
+      srcDown: editBrushPressed,
       ...options,
     });
   }
@@ -139,10 +154,10 @@ export class DeleteBinControl extends Control {
   constructor(options) {
     super({
       Tooltip: 'DeleteBin',
-      srcRest: drawlineRest,
-      srcGroup: drawlineGroupHover,
-      srcHover: drawlineHover,
-      srcDown: drawlinePressed,
+      srcRest: deleteBinRest,
+      srcGroup: deleteBinGroupHover,
+      srcHover: deleteBinHover,
+      srcDown: deleteBinPressed,
       ...options,
     });
   }
