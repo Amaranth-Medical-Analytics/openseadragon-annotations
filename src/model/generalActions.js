@@ -29,10 +29,11 @@ function createCircleOverlay(x, y, threshold){
   
   // Define and render SVG circle
   let d3Circle = d3.select(overlay.node()).append("circle")
-    .style('fill', '#f00')
+    .attr("id","poly_overlay")
     .attr("cx", x / 100)
     .attr("cy", y*asp_ratio / 100)
     .attr("r", threshold / (100*viewer.viewport.getZoom()))
+    .style('fill', '#f00')
     .style("opacity", 0.5);
 }
 
@@ -133,7 +134,7 @@ const reactToGeneralAction = (model) =>
                       'vector-effect': 'non-scaling-stroke',
                     }, `${model.annotationname}`,
                   ]);
-                  d3.select(viewer.svgOverlay().node()).selectAll("*").remove();
+                  d3.select('#poly_overlay').remove();
                   createCircleOverlay(action.x, action.y, threshold);
                 }
                 break;
@@ -174,7 +175,7 @@ const reactToGeneralAction = (model) =>
                 lastAnnotation[1].d += ' Z';
                 
                 // Close overlay
-                d3.select(viewer.svgOverlay().node()).selectAll("*").remove();
+                d3.select('#poly_overlay').remove();
                 
                 model.activityInProgress = false;
                 model.clicks = 0;
@@ -233,10 +234,10 @@ const reactToGeneralAction = (model) =>
             const distanceToStart = pointDistance(lastAnnotation[1].points[0], {'x':action.x,'y':action.y})
             if (distanceToStart < threshold && lastAnnotation[1].points.length > 1){
               // Keep cleaning overlays on move to maintain opacity
-              d3.select(viewer.svgOverlay().node()).selectAll("*").remove();
+              d3.select('#poly_overlay').remove();
               createCircleOverlay(lastAnnotation[1].points[0].x, lastAnnotation[1].points[0].y, threshold);
             } else {
-              d3.select(viewer.svgOverlay().node()).selectAll("*").remove();
+              d3.select('#poly_overlay').remove();
             }
 
           } else if (lastAnnotation && lastAnnotation[0] === 'path' && model.mode === 'RECTANGLE'){
