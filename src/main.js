@@ -50,19 +50,23 @@ const annotationsPrototype = {
   },
 
   getAnnotations() {
-    return this.model.getAll();
+    const activeLayer = this.activeLayer;
+    return this.overlays[activeLayer].model.getAll();
   },
 
   setAnnotations(annotations) {
+    const activeLayer = this.activeLayer;
     this.dispatch({ type: 'ANNOTATIONS_RESET', annotations });
   },
 
   cleanAnnotations() {
+    const activeLayer = this.activeLayer;
     this.dispatch({ type: 'ANNOTATIONS_RESET' });
   },
 
   getMode() {
-    return this.model.mode;
+    const activeLayer = this.activeLayer;
+    return this.overlays[activeLayer].model.mode;
   },
 
   setMode(mode) {
@@ -70,35 +74,40 @@ const annotationsPrototype = {
   },
 
   setAnnotationColor(color) {
-    this.model.annotationcolor = color;
+    const activeLayer = this.activeLayer;
+    this.overlays[activeLayer].model.annotationcolor = color;
   },
 
   setAnnotationLineWidth(linewidth) {
-    this.model.annotationlinewidth = linewidth;
+    const activeLayer = this.activeLayer;
+    this.overlays[activeLayer].model.annotationlinewidth = linewidth;
   },
 
   setAnnotationName(name) {
-    this.model.annotationname = name;
+    const activeLayer = this.activeLayer;
+    this.overlays[activeLayer].model.annotationname = name;
   },
 
   setAnnotationText(text) {
-    this.model.annotationtext = text;
+    const activeLayer = this.activeLayer;
+    this.overlays[activeLayer].model.annotationtext = text;
   },
 
   setAnnotationFontsize(fontsize) {
-    this.model.annotationfontsize = parseFloat(fontsize);
-    this.model.zoomUpdate()
+    const activeLayer = this.activeLayer;
+    this.overlays[activeLayer].model.annotationfontsize = parseFloat(fontsize);
+    this.overlays[activeLayer].model.zoomUpdate()
   },
 
   getStatus() {
-    return { active: !!this.overlay };
+    return { active: !!this.overlays[this.activeLayer].svg };
   },
 
   EnableControls(active) {
-    this.model.controlsactive = !!active;
+    this.overlays[this.activeLayer].model.controlsactive = !!active;
     if (this.controls) {
       for (let index = 0; index < this.controls.length; index += 1) {
-        if (this.model.controlsactive) {
+        if (this.overlays[this.activeLayer].model.controlsactive) {
           this.controls[index].btn.enable();
         } else {
           this.controls[index].btn.disable();
