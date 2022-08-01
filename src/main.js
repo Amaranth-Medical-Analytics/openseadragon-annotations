@@ -15,16 +15,25 @@ const annotationsPrototype = {
     this.viewer.addOverlay(this.overlays[layer].svg, new Rect(0, 0, homeBounds.width, homeBounds.height));
     const { width, height } = this.overlays[layer].svg.getBoundingClientRect();
     this.dispatch({ type: 'INITIALIZE', zoom, width, height });
-    if (!this.controls) {
-      this.controls = [
-        new MoveControl({ dispatch: this.dispatch, model: this.model, viewer: this.viewer }),
-        new DrawPolyControl({ dispatch: this.dispatch, model: this.model, viewer: this.viewer }),
-        new DrawFreeControl({ dispatch: this.dispatch, model: this.model, viewer: this.viewer }),
-        new DrawRectControl({ dispatch: this.dispatch, model: this.model, viewer: this.viewer }),
-        new EditBrushControl({ dispatch: this.dispatch, model: this.model, viewer: this.viewer }),
-        new DeleteBinControl({ dispatch: this.dispatch, model: this.model, viewer: this.viewer })
-      ];
+    
+    const controlConfig = { 
+      dispatch: this.dispatch, 
+      model: this.overlays[layer].model, 
+      viewer: this.viewer 
     }
+    if (this.controls) {
+      for (let i=0; i<this.controls.length; i++) {
+        this.controls[i].destroy();
+      }
+    }
+    this.controls = [
+      new MoveControl(controlConfig),
+      new DrawPolyControl(controlConfig),
+      new DrawFreeControl(controlConfig),
+      new DrawRectControl(controlConfig),
+      new EditBrushControl(controlConfig),
+      new DeleteBinControl(controlConfig)
+    ];
     this.cleanAnnotations();
   },
 
