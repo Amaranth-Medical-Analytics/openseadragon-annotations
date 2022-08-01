@@ -101,14 +101,14 @@ const annotationsPrototype = {
       case false:
         // hide svg overlay
         this.overlays[layerName].svg.style.visibility = 'hidden';
-        if (layerName === this.activeLayer) {
-
-        }
         break;
       default:
         break;
     }
-
+    
+    if (layerName === this.activeLayer) {
+      this.EnableControls(visible);
+    }
   },
 
   getAnnotations() {
@@ -169,7 +169,8 @@ const annotationsPrototype = {
     this.overlays[this.activeLayer].model.controlsactive = !!active;
     if (this.controls) {
       for (let index = 0; index < this.controls.length; index += 1) {
-        if (this.overlays[this.activeLayer].model.controlsactive) {
+        if (this.overlays[this.activeLayer].model.controlsactive
+          || this.controls[index].mode === 'MOVE') {
           this.controls[index].btn.enable();
         } else {
           this.controls[index].btn.disable();
