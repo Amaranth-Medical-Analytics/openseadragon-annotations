@@ -35,6 +35,14 @@ const annotationsPrototype = {
       new DeleteBinControl(controlConfig)
     ];
     this.cleanAnnotations();
+
+    for (const overlay in this.overlays) {
+      if (overlay === layer) {
+        this.overlays[overlay].svg.style.pointerEvents = 'visiblePainted';
+      } else {
+        this.overlays[overlay].svg.style.pointerEvents = 'none';
+      }
+    }
   },
 
   onClose() {
