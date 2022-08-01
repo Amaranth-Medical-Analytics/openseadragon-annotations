@@ -47,6 +47,68 @@ const annotationsPrototype = {
 
   onClose() {
     // TODO
+    // Clear model
+    // Clear dispatcher
+    // Remove controls
+  },
+
+  /*
+   Layer controls
+  */
+  addLayer(layerName) {
+    const model = createModel();
+    this.dispatch = createDispatcher(model, generalActions);
+
+    this.overlays[layerName] = {
+      model: model,
+      svg: render(h(Overlay, { dispatch: this.dispatch, model: model }))
+    };
+
+    this.onOpen(layerName);
+  },
+
+  setLayer(layerName) {
+    this.dispatch = createDispatcher(this.overlays[layerName].model, generalActions);
+    this.onOpen(layerName);
+  },
+
+  removeLayer(layerName) {
+    if (layerName === 'default') {
+      console.warn('Cannot delete default layer!');
+      return;
+    }
+
+    // If active layer, set engine to default layer
+    if (layerName === this.activeLayer) {
+      this.setLayer('default');
+    }
+
+    // remove visual overlay and remove overlay object
+    this.viewer.removeOverlay(this.overlays[layerName]);
+    delete this.overlays[layerName];
+  },
+
+  getLayer() {
+    return this.activeLayer;
+  },
+
+  toggleLayer(visible, layerName) {
+    switch (visible) {
+      case true:
+        // show svg overlay
+        this.overlays[layerName].svg.style.visibility = 'visible';
+        break;
+      case false:
+        // hide svg overlay
+        this.overlays[layerName].svg.style.visibility = 'hidden';
+        if (layerName === this.activeLayer) {
+
+        }
+        break;
+      default:
+        break;
+    }
+
   },
 
   getAnnotations() {
