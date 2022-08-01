@@ -122,10 +122,20 @@ const annotationsPrototype = {
 };
 
 export default ({ viewer }) => {
-  const model = createModel();
-  const dispatch = createDispatcher(model, generalActions);
+  // Object to be returned
   const annotations = Object.create(annotationsPrototype);
-  Object.assign(annotations, { viewer, model, dispatch });
+
+  // Initialise default model
+  const model = createModel();
+  // Create global dispatcher linked to default model
+  const dispatch = createDispatcher(model, generalActions);
+  const overlays = {
+    'default': {
+      model: model,
+      svg: render(h(Overlay, { dispatch: dispatch, model: model }))
+    }
+  };
+  Object.assign(annotations, { viewer, dispatch, overlays });
   viewer.addHandler('open', () => annotations.onOpen());
   viewer.addHandler('zoom', ({ zoom }) => annotations.dispatch({ type: 'ZOOM_UPDATE', zoom }));
   if (viewer.isOpen()) { annotations.onOpen(); }
