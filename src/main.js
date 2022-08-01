@@ -7,12 +7,13 @@ import generalActions from './model/generalActions';
 import createModel from './model/createModel';
 
 const annotationsPrototype = {
-  onOpen() {
+  onOpen(layer='default') {
     const homeBounds = this.viewer.world.getHomeBounds();
     const zoom = this.viewer.viewport.getZoom();
-    this.overlay = render(h(Overlay, { dispatch: this.dispatch, model: this.model }));
-    this.viewer.addOverlay(this.overlay, new Rect(0, 0, homeBounds.width, homeBounds.height));
-    const { width, height } = this.overlay.getBoundingClientRect();
+    this.activeLayer = layer;
+    //this.overlay = render(h(Overlay, { dispatch: this.dispatch, model: this.model }));
+    this.viewer.addOverlay(this.overlays[layer].svg, new Rect(0, 0, homeBounds.width, homeBounds.height));
+    const { width, height } = this.overlays[layer].svg.getBoundingClientRect();
     this.dispatch({ type: 'INITIALIZE', zoom, width, height });
     if (!this.controls) {
       this.controls = [
