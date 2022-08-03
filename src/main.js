@@ -34,7 +34,8 @@ const annotationsPrototype = {
       new EditBrushControl(controlConfig),
       new DeleteBinControl(controlConfig)
     ];
-    this.cleanAnnotations();
+    this.overlays[layer].model.activityInProgress = false;
+    //this.cleanAnnotations();
 
     for (const overlay in this.overlays) {
       if (overlay === layer) {
@@ -92,7 +93,7 @@ const annotationsPrototype = {
     return this.activeLayer;
   },
 
-  toggleLayer(visible, layerName) {
+  toggleLayer(layerName, visible) {
     switch (visible) {
       case true:
         // show svg overlay
@@ -105,7 +106,7 @@ const annotationsPrototype = {
       default:
         break;
     }
-    
+
     if (layerName === this.activeLayer) {
       this.EnableControls(visible);
     }
