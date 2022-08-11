@@ -11,8 +11,11 @@ const annotationsPrototype = {
     const homeBounds = this.viewer.world.getHomeBounds();
     const zoom = this.viewer.viewport.getZoom();
     this.activeLayer = layer;
-    //this.overlay = render(h(Overlay, { dispatch: this.dispatch, model: this.model }));
-    this.viewer.addOverlay(this.overlays[layer].svg, new Rect(0, 0, homeBounds.width, homeBounds.height));
+    
+    if (!viewer.getOverlayById(layer)) {
+      this.viewer.addOverlay(this.overlays[layer].svg, new Rect(0, 0, homeBounds.width, homeBounds.height));
+    }
+
     const { width, height } = this.overlays[layer].svg.getBoundingClientRect();
     this.dispatch({ type: 'INITIALIZE', zoom, width, height });
     
@@ -62,7 +65,7 @@ const annotationsPrototype = {
 
     this.overlays[layerName] = {
       model: model,
-      svg: render(h(Overlay, { dispatch: this.dispatch, model: model }))
+      svg: render(h(Overlay, { name: layerName, dispatch: this.dispatch, model: model }))
     };
 
     this.onOpen(layerName);
