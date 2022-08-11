@@ -239,7 +239,6 @@ export default ({ viewer }) => {
   Object.assign(annotations, { viewer, dispatch, overlays });
   viewer.addHandler('open', () => annotations.onOpen());
   viewer.addHandler('zoom', ({ zoom }) => annotations.dispatch({ type: 'ZOOM_UPDATE', zoom }));
-  if (viewer.isOpen()) { annotations.onOpen(); }
   return annotations;
 };
 
