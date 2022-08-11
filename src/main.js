@@ -121,8 +121,15 @@ const annotationsPrototype = {
   },
 
   setAnnotations(annotations) {
-    const activeLayer = this.activeLayer;
+    // Sets annotations of currently active layer
     this.dispatch({ type: 'ANNOTATIONS_RESET', annotations });
+  },
+
+  setLayerAnnotations(annotations, layerName) {
+    const layer_model = this.overlays[layerName].model;
+    layer_model.activityInProgress = false;
+    layer_model.annotations = annotations || [];
+    return;
   },
 
   cleanAnnotations() {
