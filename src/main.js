@@ -233,7 +233,7 @@ export default ({ viewer }) => {
   const overlays = {
     'default': {
       model: model,
-      svg: render(h(Overlay, { dispatch: dispatch, model: model }))
+      svg: render(h(Overlay, { name: 'default', dispatch: dispatch, model: model }))
     }
   };
   Object.assign(annotations, { viewer, dispatch, overlays });
