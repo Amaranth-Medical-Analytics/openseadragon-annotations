@@ -77,6 +77,10 @@ export class Control {
     this.btn.imgDown.style.visibility = 'hidden';
   }
 
+  destroy() {
+    this.viewer.removeControl(this.btn.element);
+  }
+
   onClick({ eventSource }) {
     if (eventSource.Tooltip) {
       const mode = eventSource.Tooltip.toUpperCase();

@@ -99,6 +99,7 @@ class Overlay extends Component {
         viewBox: '0 0 100 100',
         width: '100%',
         height: '100%',
+        id: this.props.name,
         style: {
           cursor: 'default',
           'background-color': 'rgba(0,0,0,0)', // IE 9-10 fix

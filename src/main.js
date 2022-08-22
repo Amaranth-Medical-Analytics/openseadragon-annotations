@@ -7,44 +7,139 @@ import generalActions from './model/generalActions';
 import createModel from './model/createModel';
 
 const annotationsPrototype = {
-  onOpen() {
+  onOpen(layer='default') {
     const homeBounds = this.viewer.world.getHomeBounds();
     const zoom = this.viewer.viewport.getZoom();
-    this.overlay = render(h(Overlay, { dispatch: this.dispatch, model: this.model }));
-    this.viewer.addOverlay(this.overlay, new Rect(0, 0, homeBounds.width, homeBounds.height));
-    const { width, height } = this.overlay.getBoundingClientRect();
-    this.dispatch({ type: 'INITIALIZE', zoom, width, height });
-    if (!this.controls) {
-      this.controls = [
-        new MoveControl({ dispatch: this.dispatch, model: this.model, viewer: this.viewer }),
-        new DrawPolyControl({ dispatch: this.dispatch, model: this.model, viewer: this.viewer }),
-        new DrawFreeControl({ dispatch: this.dispatch, model: this.model, viewer: this.viewer }),
-        new DrawRectControl({ dispatch: this.dispatch, model: this.model, viewer: this.viewer }),
-        new EditBrushControl({ dispatch: this.dispatch, model: this.model, viewer: this.viewer }),
-        new DeleteBinControl({ dispatch: this.dispatch, model: this.model, viewer: this.viewer })
-      ];
+    this.activeLayer = layer;
+    
+    if (!viewer.getOverlayById(layer)) {
+      this.viewer.addOverlay(this.overlays[layer].svg, new Rect(0, 0, homeBounds.width, homeBounds.height));
     }
-    this.cleanAnnotations();
+
+    const { width, height } = this.overlays[layer].svg.getBoundingClientRect();
+    this.dispatch({ type: 'INITIALIZE', zoom, width, height });
+    
+    const controlConfig = { 
+      dispatch: this.dispatch, 
+      model: this.overlays[layer].model, 
+      viewer: this.viewer 
+    }
+    if (this.controls) {
+      for (let i=0; i<this.controls.length; i++) {
+        this.controls[i].destroy();
+      }
+    }
+    this.controls = [
+      new MoveControl(controlConfig),
+      new DrawPolyControl(controlConfig),
+      new DrawFreeControl(controlConfig),
+      new DrawRectControl(controlConfig),
+      new EditBrushControl(controlConfig),
+      new DeleteBinControl(controlConfig)
+    ];
+    this.overlays[layer].model.activityInProgress = false;
+    //this.cleanAnnotations();
+
+    for (const overlay in this.overlays) {
+      if (overlay === layer) {
+        this.overlays[overlay].svg.style.pointerEvents = 'visiblePainted';
+      } else {
+        this.overlays[overlay].svg.style.pointerEvents = 'none';
+      }
+    }
   },
 
   onClose() {
     // TODO
+    // Clear model
+    // Clear dispatcher
+    // Remove controls
+  },
+
+  /*
+   Layer controls
+  */
+  addLayer(layerName) {
+    const model = createModel();
+    this.dispatch = createDispatcher(model, generalActions);
+
+    this.overlays[layerName] = {
+      model: model,
+      svg: render(h(Overlay, { name: layerName, dispatch: this.dispatch, model: model }))
+    };
+
+    this.onOpen(layerName);
+  },
+
+  setLayer(layerName) {
+    this.dispatch = createDispatcher(this.overlays[layerName].model, generalActions);
+    this.onOpen(layerName);
+  },
+
+  removeLayer(layerName) {
+    if (layerName === 'default') {
+      console.warn('Cannot delete default layer!');
+      return;
+    }
+
+    // If active layer, set engine to default layer
+    if (layerName === this.activeLayer) {
+      this.setLayer('default');
+    }
+
+    // remove visual overlay and remove overlay object
+    this.viewer.removeOverlay(this.overlays[layerName]);
+    delete this.overlays[layerName];
+  },
+
+  getLayer() {
+    return this.activeLayer;
+  },
+
+  toggleLayer(layerName, visible) {
+    switch (visible) {
+      case true:
+        // show svg overlay
+        this.overlays[layerName].svg.style.visibility = 'visible';
+        break;
+      case false:
+        // hide svg overlay
+        this.overlays[layerName].svg.style.visibility = 'hidden';
+        break;
+      default:
+        break;
+    }
+
+    if (layerName === this.activeLayer) {
+      this.EnableControls(visible);
+    }
   },
 
   getAnnotations() {
-    return this.model.getAll();
+    const activeLayer = this.activeLayer;
+    return this.overlays[activeLayer].model.getAll();
   },
 
   setAnnotations(annotations) {
+    // Sets annotations of currently active layer
     this.dispatch({ type: 'ANNOTATIONS_RESET', annotations });
   },
 
+  setLayerAnnotations(annotations, layerName) {
+    const layer_model = this.overlays[layerName].model;
+    layer_model.activityInProgress = false;
+    layer_model.annotations = annotations || [];
+    return;
+  },
+
   cleanAnnotations() {
+    const activeLayer = this.activeLayer;
     this.dispatch({ type: 'ANNOTATIONS_RESET' });
   },
 
   getMode() {
-    return this.model.mode;
+    const activeLayer = this.activeLayer;
+    return this.overlays[activeLayer].model.mode;
   },
 
   setMode(mode) {
@@ -52,35 +147,41 @@ const annotationsPrototype = {
   },
 
   setAnnotationColor(color) {
-    this.model.annotationcolor = color;
+    const activeLayer = this.activeLayer;
+    this.overlays[activeLayer].model.annotationcolor = color;
   },
 
   setAnnotationLineWidth(linewidth) {
-    this.model.annotationlinewidth = linewidth;
+    const activeLayer = this.activeLayer;
+    this.overlays[activeLayer].model.annotationlinewidth = linewidth;
   },
 
   setAnnotationName(name) {
-    this.model.annotationname = name;
+    const activeLayer = this.activeLayer;
+    this.overlays[activeLayer].model.annotationname = name;
   },
 
   setAnnotationText(text) {
-    this.model.annotationtext = text;
+    const activeLayer = this.activeLayer;
+    this.overlays[activeLayer].model.annotationtext = text;
   },
 
   setAnnotationFontsize(fontsize) {
-    this.model.annotationfontsize = parseFloat(fontsize);
-    this.model.zoomUpdate()
+    const activeLayer = this.activeLayer;
+    this.overlays[activeLayer].model.annotationfontsize = parseFloat(fontsize);
+    this.overlays[activeLayer].model.zoomUpdate()
   },
 
   getStatus() {
-    return { active: !!this.overlay };
+    return { active: !!this.overlays[this.activeLayer].svg };
   },
 
   EnableControls(active) {
-    this.model.controlsactive = !!active;
+    this.overlays[this.activeLayer].model.controlsactive = !!active;
     if (this.controls) {
       for (let index = 0; index < this.controls.length; index += 1) {
-        if (this.model.controlsactive) {
+        if (this.overlays[this.activeLayer].model.controlsactive
+          || this.controls[index].mode === 'MOVE') {
           this.controls[index].btn.enable();
         } else {
           this.controls[index].btn.disable();
@@ -122,13 +223,22 @@ const annotationsPrototype = {
 };
 
 export default ({ viewer }) => {
-  const model = createModel();
-  const dispatch = createDispatcher(model, generalActions);
+  // Object to be returned
   const annotations = Object.create(annotationsPrototype);
-  Object.assign(annotations, { viewer, model, dispatch });
+
+  // Initialise default model
+  const model = createModel();
+  // Create global dispatcher linked to default model
+  const dispatch = createDispatcher(model, generalActions);
+  const overlays = {
+    'default': {
+      model: model,
+      svg: render(h(Overlay, { name: 'default', dispatch: dispatch, model: model }))
+    }
+  };
+  Object.assign(annotations, { viewer, dispatch, overlays });
   viewer.addHandler('open', () => annotations.onOpen());
   viewer.addHandler('zoom', ({ zoom }) => annotations.dispatch({ type: 'ZOOM_UPDATE', zoom }));
-  if (viewer.isOpen()) { annotations.onOpen(); }
   return annotations;
 };
 
