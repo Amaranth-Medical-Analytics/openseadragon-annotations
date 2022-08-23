@@ -84,6 +84,10 @@ export class Control {
   onClick({ eventSource }) {
     if (eventSource.Tooltip) {
       const mode = eventSource.Tooltip.toUpperCase();
+      
+      if (this.btn.element.disabled === true) {
+        return;
+      }
       this.dispatch({ type: 'MODE_UPDATE', mode });
     }
   }

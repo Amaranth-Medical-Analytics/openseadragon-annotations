@@ -143,7 +143,18 @@ const annotationsPrototype = {
   },
 
   setMode(mode) {
+    let mode_btn = null;
+    for (let i=0; i<this.controls.length; i++) {
+      if (this.controls[i].mode === mode) {
+        mode_btn = this.controls[i].btn.element;
+        break;
+      }
+    }
+    if (mode_btn.disabled === true) {
+      return;
+    }
     this.controls[0].dispatch({ type: 'MODE_UPDATE', mode });
+    return;
   },
 
   setAnnotationColor(color) {
