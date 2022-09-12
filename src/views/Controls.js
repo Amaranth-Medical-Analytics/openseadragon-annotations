@@ -89,6 +89,8 @@ export class Control {
         return;
       }
       this.dispatch({ type: 'MODE_UPDATE', mode });
+      // Make available to 3rd party
+      this.model.raiseEvent('MODE_UPDATE', mode);
     }
   }
 }
