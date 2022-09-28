@@ -7,7 +7,7 @@ import generalActions from './model/generalActions';
 import createModel from './model/createModel';
 
 const annotationsPrototype = {
-  onOpen(layer='default') {
+  onOpen(layer='default', resetControls=true) {
     const homeBounds = this.viewer.world.getHomeBounds();
     const zoom = this.viewer.viewport.getZoom();
     this.activeLayer = layer;
@@ -24,21 +24,8 @@ const annotationsPrototype = {
       model: this.overlays[layer].model, 
       viewer: this.viewer 
     }
-    if (this.controls) {
-      for (let i=0; i<this.controls.length; i++) {
-        this.controls[i].destroy();
-      }
-    }
-    this.controls = [
-      new MoveControl(controlConfig),
-      new DrawPolyControl(controlConfig),
-      new DrawFreeControl(controlConfig),
-      new DrawRectControl(controlConfig),
-      new EditBrushControl(controlConfig),
-      new DeleteBinControl(controlConfig)
-    ];
+
     this.overlays[layer].model.activityInProgress = false;
-    //this.cleanAnnotations();
 
     for (const overlay in this.overlays) {
       if (overlay === layer) {
@@ -47,6 +34,26 @@ const annotationsPrototype = {
         this.overlays[overlay].svg.style.pointerEvents = 'none';
       }
     }
+
+    if (resetControls === false) {
+      return;
+    }
+
+    if (this.controls) {
+      for (let i=0; i<this.controls.length; i++) {
+        this.controls[i].destroy();
+      }
+    }
+
+    this.controls = [
+      new MoveControl(controlConfig),
+      new DrawPolyControl(controlConfig),
+      new DrawFreeControl(controlConfig),
+      new DrawRectControl(controlConfig),
+      new EditBrushControl(controlConfig),
+      new DeleteBinControl(controlConfig)
+    ];
+    return;
   },
 
   onClose() {
@@ -71,9 +78,9 @@ const annotationsPrototype = {
     this.onOpen(layerName);
   },
 
-  setLayer(layerName) {
+  setLayer(layerName, resetControls=true) {
     this.dispatch = createDispatcher(this.overlays[layerName].model, generalActions);
-    this.onOpen(layerName);
+    this.onOpen(layerName, resetControls);
   },
 
   removeLayer(layerName) {
