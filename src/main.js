@@ -1,7 +1,7 @@
 import { Rect } from 'OpenSeadragon';
 import { h, render } from 'preact';
 import Overlay from './views/Overlay';
-import { DeleteBinControl, DrawFreeControl, DrawPolyControl, DrawRectControl, EditBrushControl, MoveControl } from './views/Controls';
+import { DeleteBinControl, DrawFreeControl, DrawPolyControl, DrawRectControl, EditBrushControl, MoveControl, SelectControl } from './views/Controls';
 import createDispatcher from './model/createDispatcher';
 import generalActions from './model/generalActions';
 import createModel from './model/createModel';
@@ -47,6 +47,7 @@ const annotationsPrototype = {
 
     this.controls = [
       new MoveControl(controlConfig),
+      new SelectControl(controlConfig),
       new DrawPolyControl(controlConfig),
       new DrawFreeControl(controlConfig),
       new DrawRectControl(controlConfig),
