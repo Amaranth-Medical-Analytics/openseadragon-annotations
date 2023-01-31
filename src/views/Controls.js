@@ -50,7 +50,7 @@ export class Control {
     this.dispatch = options.dispatch;
     this.model = options.model;
     this.viewer = options.viewer;
-    this.mode = options.Tooltip.toUpperCase();
+    this.mode = options.tooltip.toUpperCase();
     this.btn = new Button(extend({
       onClick: (e) => { this.onClick(e); },
     }, options));
@@ -87,8 +87,8 @@ export class Control {
   }
 
   onClick({ eventSource }) {
-    if (eventSource.Tooltip) {
-      const mode = eventSource.Tooltip.toUpperCase();
+    if (eventSource.tooltip) {
+      const mode = eventSource.tooltip.toUpperCase();
       
       if (this.btn.element.disabled === true) {
         return;
