@@ -112,7 +112,11 @@ class Overlay extends Component {
         onPointerDown: onMouseDown,
         onPointerUp: onMouseUp,
       },
-      (typeof this.state.annotations !== 'undefined') ? this.state.annotations.map((el) => this.renderElement(el, this.state)) : undefined,
+      (typeof this.state.annotations === 'undefined') 
+        ? undefined
+        : (this.state.selection === null) 
+          ? this.state.annotations.map((el) => this.renderElement(el, this.state)) 
+          : [...this.state.annotations, this.state.selection].map((el) => this.renderElement(el, this.state))
     );
   }
 }
