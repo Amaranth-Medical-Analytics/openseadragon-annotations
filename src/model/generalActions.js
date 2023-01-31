@@ -1,3 +1,5 @@
+import { createRef } from "preact";
+
 function createSvgFromPoints(points){
   var path = null;
   for (var i=0; i<points.length; i++){
@@ -169,6 +171,7 @@ const reactToGeneralAction = (model) =>
                     model.selection = [
                       'path',
                       {
+                        ref: ref,
                         fill: 'none',
                         points: [],
                         start: {'x':action.x, 'y':action.y},
