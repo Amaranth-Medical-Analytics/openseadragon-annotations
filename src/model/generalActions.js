@@ -268,8 +268,6 @@ const reactToGeneralAction = (model) =>
 
         if (model.mode === 'LINEDRAW' 
             || model.mode === 'FREEDRAW' 
-              || model.mode === 'FREEDRAW' 
-            || model.mode === 'FREEDRAW' 
             || model.mode === 'POLYDRAW'
             || model.mode === 'RECTANGLE'
             || model.mode === 'TEXT') {
