@@ -329,6 +329,13 @@ const reactToGeneralAction = (model) =>
       case 'ANNOTATIONS_RESET':
         model.activityInProgress = false;
         model.annotations = action.annotations || [];
+
+        break;
+      
+      case 'SELECTION_RESET':
+        model.activityInProgress = false;
+        model.selection = null;
+
         break;
 
       case 'ZOOM_UPDATE':
