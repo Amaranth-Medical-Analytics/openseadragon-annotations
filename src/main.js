@@ -125,7 +125,16 @@ const annotationsPrototype = {
 
   getAnnotations() {
     const activeLayer = this.activeLayer;
-    return this.overlays[activeLayer].model.getAll();
+    return this.overlays[activeLayer].model.annotations;
+  },
+
+  getSelection() {
+    const activeLayer = this.activeLayer;
+    return this.overlays[activeLayer].model.selection;
+  },
+
+  cleanSelection() {
+    this.dispatch({ type: 'SELECTION_RESET', annotations })
   },
 
   setAnnotations(annotations) {
