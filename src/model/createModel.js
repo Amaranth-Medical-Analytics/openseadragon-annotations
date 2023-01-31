@@ -10,6 +10,7 @@ export default () =>
     clicks: 0,
     activityInProgress: false,
     annotations: [],
+    selection : null,
     annotationcolor: 'green',
     annotationlinewidth: 3,
     annotationname: '',
