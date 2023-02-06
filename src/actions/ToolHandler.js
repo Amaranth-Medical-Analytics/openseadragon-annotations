@@ -6,7 +6,16 @@ import RectangleDrawTool from './tools/RectangleDrawTool';
 import EditBrushTool from './tools/EditBrushTool';
 import DeleteBinTool from './tools/DeleteBinTool';
 
+/**
+ * @class ToolHandler
+ * ToolHandler is a singleton class that remains unique for a given dispatcher. While a layer is 
+ * active, a toolhandler delegates actions to all tools in the current layer. Instance is re-created
+ * when a dispatcher is flushed. 
+ */
 class ToolHandler {
+  /**
+   * Instantiate an instance 
+   */
   static instance = null;
 
   static getInstance(model) {
@@ -15,7 +24,11 @@ class ToolHandler {
     }
     return ToolHandler.instance;
   }
-
+  
+  /**
+   * Create an instance of the ToolHandler class
+   * @param {*} model - The model being used in the current dispatcher. 
+   */
   constructor(model) {
     if (ToolHandler.instance) {
       if (ToolHandler.instance.model !== model) {
@@ -49,9 +62,7 @@ class ToolHandler {
       ['ZOOM_UPDATE', 'onZoom']
     ]) 
 
-    console.log(this.model.mode);
     this.currentTool = this.selectTool(this.model.mode);
-
     ToolHandler.instance = this;
   }
 
@@ -64,13 +75,7 @@ class ToolHandler {
   }
 
   updateTool() {
-    console.log("Before updateTool: this.model.mode =", this.model.mode);
-    console.log("Before updateTool: this.currentTool =", this.currentTool);
-    
     this.currentTool = this.selectTool(this.model.mode);
-
-    console.log("After updateTool: this.model.mode =", this.model.mode);
-    console.log("After updateTool: this.currentTool =", this.currentTool);
   }
 
   handleAction(action) {

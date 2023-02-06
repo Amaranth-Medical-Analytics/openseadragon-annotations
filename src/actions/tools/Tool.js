@@ -1,3 +1,7 @@
+/**
+ * @class 
+ * Class respresenting a base tool. Tied to control.
+ */
 export default class Tool {
     constructor(model) {
         this.model = model;
