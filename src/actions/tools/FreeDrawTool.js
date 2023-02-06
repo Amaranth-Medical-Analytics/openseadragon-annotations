@@ -12,15 +12,22 @@ class FreeDrawTool extends Tool {
   }
 
   onPress( action ) {
+    // Do not propagate if control buttons are inactive. 
     if (!this.model.controlsactive) {
       return;
     }
 
+    // Do not propogate if another annotation action is in progress 
+    // (eg. a click while creating a freedraw annotation should not trigger a second annotation)
+    // NOTE: This should not occur as a release event will be fired before a second click. However, will
+    // need to add checks in model to ensure state is correctly state before requested update from next 
+    // action. 
     if (this.model.activityInProgress) {
       return;
     }
 
     super.onPress();
+    // Mark state as annotation creation in progress. 
     this.model.activityInProgress = true;
     
     const { x, y } = action;
