@@ -3,7 +3,7 @@ import { h, render } from 'preact';
 import Overlay from './views/Overlay';
 import { DeleteBinControl, DrawFreeControl, DrawPolyControl, DrawRectControl, EditBrushControl, MoveControl, SelectControl } from './views/Controls';
 import createDispatcher from './model/createDispatcher';
-import generalActions from './model/generalActions';
+import generalActions from './actions/generalActions'
 import createModel from './model/createModel';
 
 const annotationsPrototype = {
