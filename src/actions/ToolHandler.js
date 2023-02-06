@@ -3,6 +3,8 @@ import SelectionTool from './tools/SelectionTool';
 import FreeDrawTool from './tools/FreeDrawTool';
 import PolyDrawTool from './tools/PolyDrawTool';
 import RectangleDrawTool from './tools/RectangleDrawTool';
+import EditBrushTool from './tools/EditBrushTool';
+import DeleteBinTool from './tools/DeleteBinTool';
 
 class ToolHandler {
   static instance = null;
@@ -31,7 +33,9 @@ class ToolHandler {
       ['SELECT', () => new SelectionTool(this.model)],
       ['FREEDRAW', () => new FreeDrawTool(this.model)],
       ['POLYDRAW', () => new PolyDrawTool(this.model)],
-      ['RECTANGLE', () => new RectangleDrawTool(this.model)]
+      ['RECTANGLE', () => new RectangleDrawTool(this.model)],
+      ['EDITBRUSH', () => new EditBrushTool(this.model)],
+      ['DELETEBIN', () => new DeleteBinTool(this.model)]
     ]);
 
     /**
