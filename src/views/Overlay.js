@@ -101,7 +101,7 @@ class Overlay extends Component {
         height: '100%',
         id: this.props.name,
         style: {
-          cursor: 'default',
+          cursor: (this.state.mode === 'MOVE' ? 'move' : 'crosshair'),
           'background-color': 'rgba(0,0,0,0)', // IE 9-10 fix
         },
         onMouseDown,
