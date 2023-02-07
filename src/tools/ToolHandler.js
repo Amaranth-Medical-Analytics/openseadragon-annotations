@@ -1,10 +1,10 @@
-import MoveTool from './tools/MoveTool';
-import SelectionTool from './tools/SelectionTool';
-import FreeDrawTool from './tools/FreeDrawTool';
-import PolyDrawTool from './tools/PolyDrawTool';
-import RectangleDrawTool from './tools/RectangleDrawTool';
-import EditBrushTool from './tools/EditBrushTool';
-import DeleteBinTool from './tools/DeleteBinTool';
+import MoveTool from './MoveTool';
+import SelectionTool from './SelectionTool';
+import FreeDrawTool from './FreeDrawTool';
+import PolyDrawTool from './PolyDrawTool';
+import RectangleDrawTool from './RectangleDrawTool';
+import EditBrushTool from './EditBrushTool';
+import DeleteBinTool from './DeleteBinTool';
 
 /**
  * @class ToolHandler

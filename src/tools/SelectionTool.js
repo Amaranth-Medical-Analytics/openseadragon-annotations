@@ -1,6 +1,6 @@
 import { createRef } from "preact";
 import Tool from "./Tool";
-import { createSvgFromPoints } from "../../utils";
+import { createSvgFromPoints } from "../utils";
 
 class SelectionTool extends Tool {
   constructor(model) {

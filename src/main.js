@@ -3,7 +3,7 @@ import { h, render } from 'preact';
 import Overlay from './views/Overlay';
 import { DeleteBinControl, DrawFreeControl, DrawPolyControl, DrawRectControl, EditBrushControl, MoveControl, SelectControl } from './views/Controls';
 import createDispatcher from './model/createDispatcher';
-import generalActions from './actions/generalActions'
+import actionsStore from './actions'
 import createModel from './model/createModel';
 
 const annotationsPrototype = {
@@ -69,7 +69,7 @@ const annotationsPrototype = {
   */
   addLayer(layerName) {
     const model = createModel();
-    this.dispatch = createDispatcher(model, generalActions);
+    this.dispatch = createDispatcher(model, actionsStore);
 
     this.overlays[layerName] = {
       model: model,
@@ -80,7 +80,7 @@ const annotationsPrototype = {
   },
 
   setLayer(layerName, resetControls=true) {
-    this.dispatch = createDispatcher(this.overlays[layerName].model, generalActions);
+    this.dispatch = createDispatcher(this.overlays[layerName].model, actionsStore);
     this.onOpen(layerName, resetControls);
   },
 
@@ -257,7 +257,7 @@ export default ({ viewer }) => {
   // Initialise default model
   const model = createModel();
   // Create global dispatcher linked to default model
-  const dispatch = createDispatcher(model, generalActions);
+  const dispatch = createDispatcher(model, actionsStore);
   const overlays = {
     'default': {
       model: model,

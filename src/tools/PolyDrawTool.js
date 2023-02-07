@@ -1,7 +1,7 @@
 import Tool from "./Tool";
-import { createSvgFromPoints } from "../../utils";
-import { createCircleOverlay } from "../../utils";
-import { pointDistance } from "../../utils";
+import { createSvgFromPoints } from "../utils";
+import { createCircleOverlay } from "../utils";
+import { pointDistance } from "../utils";
 
 class PolyDrawTool extends Tool {
   constructor(model) {

@@ -1,5 +1,5 @@
 import Tool from "./Tool";
-import { createSvgFromPoints } from "../../utils";
+import { createSvgFromPoints } from "../utils";
 
 class RectangleDrawTool extends Tool {
   constructor(model) {

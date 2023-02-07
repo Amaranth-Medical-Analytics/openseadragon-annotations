@@ -1,5 +1,5 @@
 import { Dispatcher } from 'flux';
-import ToolHandler from '../actions/ToolHandler';
+import ToolHandler from '../tools/ToolHandler';
 
 /**
  * FLUX ARCHITECTURE
@@ -14,27 +14,25 @@ import ToolHandler from '../actions/ToolHandler';
  * In this case, 
  * View - Overlay SVG defined in Overlay.js, and Control buttons defined in Controls.js
  * Store - Model as defined in createModel.js
- * Dispatcher - The createDispatcher function that is called when creating the view, with the model and generalActions
+ * Dispatcher - The createDispatcher function that is called when creating the view, with the model and actionsStore
  * passed as props. 
  */
 
 /**
  * Dispatcher
  * Creates a dispatcher based on the Flux architecture. Dispatchers broadcast payloads (actions) to registered
- * callbacks (reactions/generalActions). 
+ * callbacks (reactions/actionsStore). 
  * Dispatchers are not a pub-sub system, a specific callback is not subscribed to any particular action/event. 
  * Every payload is dispatched to every registered callback. 
- * In this case, the callback (reaction) receives all payloads, and needs to filter for action from within the 
- * callback. 
+ * In this case, the callbacks (reactions) receive all payloads, and each callback needs to filter for action 
+ * from within itself. If the same action is captured by multiple callbacks, all of them will execute.  
  * 
- * NOTE: Despite the ...reactions spread operator, only one callback (reactToGeneralAction, imported as 
- * generalActions) is used in this codebase.
  * @param {*} model - An object defining the state to be managed.
- * @param  {...any} reactions - A function detailing state altering callbacks to be dispatched 
+ * @param  {array} reactions - An array of callback functions detailing state altering callbacks to be dispatched 
  * based on a raised action (payload). 
  * @returns 
  */
-const createDispatcher = (model, ...reactions) => {
+const createDispatcher = (model, reactions) => {
   const dispatcher = new Dispatcher();
   const toolHandler = new ToolHandler(model);
 
