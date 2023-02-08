@@ -77,46 +77,40 @@ class PolyDrawTool extends Tool {
   }
 
   onMove( action ) {
-    if (!this.model.activityInProgress) {
-      return;
-    }
+    if (this.model.activityInProgress === true) {
+      const { x, y } = action;
+      const lastAnnotation = this.model.annotations[this.model.annotations.length - 1];  
+      
+      // In first move, removes current duplicate + all duplicates made while moving
+      lastAnnotation[1].points.pop();
+      // Creates the duplicate, will remove at end of move - remove on click
+      lastAnnotation[1].points.push({'x': x, 'y': y});
+      lastAnnotation[1].d = createSvgFromPoints(lastAnnotation[1].points);
 
-    const { x, y } = action;
-    const lastAnnotation = this.model.annotations[this.model.annotations.length - 1];  
-    
-    // In first move, removes current duplicate + all duplicates made while moving
-    lastAnnotation[1].points.pop();
-    // Creates the duplicate, will remove at end of move - remove on click
-    lastAnnotation[1].points.push({'x': x, 'y': y});
-    lastAnnotation[1].d = createSvgFromPoints(lastAnnotation[1].points);
-
-    const distanceToStart = pointDistance(lastAnnotation[1].points[0], {'x': x,'y': y})
-    if (distanceToStart < this.THRESHOLD && lastAnnotation[1].points.length > 1){
-      // Keep cleaning overlays on move to maintain opacity
-      d3.select('#poly_overlay').remove();
-      createCircleOverlay(lastAnnotation[1].points[0].x, lastAnnotation[1].points[0].y, this.THRESHOLD);
-    } else {
-      d3.select('#poly_overlay').remove();
+      const distanceToStart = pointDistance(lastAnnotation[1].points[0], {'x': x,'y': y})
+      if (distanceToStart < this.THRESHOLD && lastAnnotation[1].points.length > 1){
+        // Keep cleaning overlays on move to maintain opacity
+        d3.select('#poly_overlay').remove();
+        createCircleOverlay(lastAnnotation[1].points[0].x, lastAnnotation[1].points[0].y, this.THRESHOLD);
+      } else {
+        d3.select('#poly_overlay').remove();
+      }
     }
   }
 
   onLeaveCanvas() {
-    if (!this.model.activityInProgress) {
-      return;
+    if (this.model.activityInProgress === true) {
+      this.model.annotations.pop();
     }
-
-    this.model.annotations.pop();
   }
 
   onRelease() {}
 
   onZoom() {
-    if (!this.model.activityInProgress) {
-      return;
+    if (this.model.activityInProgress === true) {
+      super.onZoom();
+      this.model.annotations.pop();
     }
-
-    super.onZoom();
-    this.model.annotations.pop();
   }
 }
 
