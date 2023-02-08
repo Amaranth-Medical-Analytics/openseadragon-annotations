@@ -62,20 +62,16 @@ class ToolHandler {
       ['ZOOM_UPDATE', 'onZoom']
     ]) 
 
-    this.currentTool = this.selectTool(this.model.mode);
+    this.setCurrentTool();
     ToolHandler.instance = this;
-  }
-
-  selectTool(mode) {
-    return this.toolMap.get(mode)();
   }
 
   cleanTool() {
     this.currentTool.reset();
   }
 
-  updateTool() {
-    this.currentTool = this.selectTool(this.model.mode);
+  setCurrentTool() {
+    this.currentTool = this.toolMap.get(this.model.mode)();
   }
 
   handleAction(action) {

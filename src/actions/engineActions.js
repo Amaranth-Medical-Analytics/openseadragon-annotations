@@ -31,7 +31,7 @@ const reactToEngineActions = (model, toolHandler) => {
          */
         if (model.mode !== action.mode) {
           model.mode = action.mode;
-          toolHandler.updateTool();
+          toolHandler.setCurrentTool();
         }
 
         break;
