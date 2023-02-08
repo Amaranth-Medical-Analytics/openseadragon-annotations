@@ -112,6 +112,13 @@ class Overlay extends Component {
         onPointerDown: onMouseDown,
         onPointerUp: onMouseUp,
       },
+      /**
+       * Do not render any children if annotations are undefined
+       * 
+       * If annotations are defined in state, map over each annotation and render their svg element
+       * as a child of the svg overlay. 
+       * If a selection exists, append the selection to the annotations render.
+       */
       (typeof this.state.annotations === 'undefined') 
         ? undefined
         : (this.state.selection === null) 
