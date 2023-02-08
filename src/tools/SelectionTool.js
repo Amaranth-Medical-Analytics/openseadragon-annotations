@@ -53,18 +53,16 @@ class SelectionTool extends Tool {
     if (this.model.activityInProgress === true) {
       const { x, y } = action;
       
-      if (this.model.selection) {
-        let first_point = this.model.selection[1].start;
-        let third_point = {'x':x,'y':y};
-        this.model.selection[1].points = [
-          first_point,
-          {'x':first_point.x ,'y':third_point.y},
-          third_point,
-          {'x':third_point.x ,'y':first_point.y}
-        ]
-        this.model.selection[1].d = createSvgFromPoints(this.model.selection[1].points);
-        this.model.selection[1].d += ` Z`;
-      }
+      let first_point = this.model.selection[1].start;
+      let third_point = {'x':x,'y':y};
+      this.model.selection[1].points = [
+        first_point,
+        {'x':first_point.x ,'y':third_point.y},
+        third_point,
+        {'x':third_point.x ,'y':first_point.y}
+      ]
+      this.model.selection[1].d = createSvgFromPoints(this.model.selection[1].points);
+      this.model.selection[1].d += ` Z`;
     }
   }
 
