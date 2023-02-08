@@ -1,3 +1,5 @@
+import { createRef } from "preact";
+
 function createSvgFromPoints(points){
   var path = null;
   for (var i=0; i<points.length; i++){
@@ -47,6 +49,11 @@ const reactToGeneralAction = (model) =>
             model.clicks = 0;
             model.annotations.pop();
           }
+          if (model.mode === 'SELECT') {
+            model.clicks = 0;
+            // Reset any active selection
+            model.selection = null;
+          }
           model.activityInProgress = false;
         }
 
@@ -67,6 +74,7 @@ const reactToGeneralAction = (model) =>
                 || model.mode === 'FREEDRAW' 
                 || model.mode === 'POLYDRAW'
                 || model.mode === 'RECTANGLE'
+                || model.mode === 'SELECT'
                 || model.mode === 'TEXT'){
             // Remove existing annotation if it has same non-empty name
             if (model.annotationname !== '') {
@@ -156,6 +164,28 @@ const reactToGeneralAction = (model) =>
                   ]);
                 }
                 break;
+                case 'SELECT':
+                  if (model.clicks === 1){
+                    const ref = createRef();
+
+                    model.selection = [
+                      'path',
+                      {
+                        ref: ref,
+                        fill: 'none',
+                        points: [],
+                        start: {'x':action.x, 'y':action.y},
+                        d: `M${action.x} ${action.y}`,
+                        stroke: 'lightgray',
+                        'stroke-width': '2',
+                        'stroke-linejoin': 'round',
+                        'stroke-linecap': 'round',
+                        'stroke-dasharray': '5,3', 
+                        'vector-effect': 'non-scaling-stroke',
+                      }, `selection`,
+                    ];
+                  }
+                  break;
               default:
                 break;
             }
@@ -190,36 +220,57 @@ const reactToGeneralAction = (model) =>
         break;
 
       case 'LEAVE_CANVAS':
-        if ((model.mode === 'FREEDRAW' || model.mode === 'POLYDRAW' || model.mode === 'RECTANGLE') 
-            && model.activityInProgress === true){
-          model.activityInProgress = false;
-          model.clicks = 0;
+        if (model.activityInProgress === false) {
+          break;
+        }
+
+        model.activityInProgress = false;
+        model.clicks = 0;
+
+        if (model.mode === 'FREEDRAW' || model.mode === 'POLYDRAW' || model.mode === 'RECTANGLE'){
           model.annotations.pop();
+        }
+
+        if ((model.mode === 'SELECT') && model.activityInProgress === true) {
+          model.selection = null;
         }
         break;
       
       case 'RELEASE':
+        if (model.activityInProgress === false) {
+          break;
+        }
+
+        model.activityInProgress = false;
+        model.clicks = 0;
+
         // End linedraw, freedraw, text process
-        if ((model.mode === 'FREEDRAW' || model.mode === 'RECTANGLE') 
-            && model.activityInProgress === true){
+        if (model.mode === 'FREEDRAW' || model.mode === 'RECTANGLE'){
           // Close freedraw annotation
           if (model.mode === 'FREEDRAW' ) {
             const lastAnnotation = model.annotations[model.annotations.length - 1];
             lastAnnotation[1].d += ` Z`;
           }
-          model.activityInProgress = false;
-          model.clicks = 0;
           model.raiseEvent('ANNOTATIONRELEASE_EVENT', model.annotations[model.annotations.length - 1]);
         }
+
+        if (model.mode === 'SELECT') {
+          model.raiseEvent('SELECTIONRELEASE_EVENT', model.selection);
+        }
+
         break;
       
       case 'MOVE':
-        if ((model.mode === 'LINEDRAW' 
-              || model.mode === 'FREEDRAW' 
-              || model.mode === 'POLYDRAW'
-              || model.mode === 'RECTANGLE'
-              || model.mode === 'TEXT') 
-              && model.activityInProgress === true) {
+        // Ignore if activity not in progress
+        if (model.activityInProgress === false) {
+          break;
+        }
+
+        if (model.mode === 'LINEDRAW' 
+            || model.mode === 'FREEDRAW' 
+            || model.mode === 'POLYDRAW'
+            || model.mode === 'RECTANGLE'
+            || model.mode === 'TEXT') {
           const lastAnnotation = model.annotations[model.annotations.length - 1];      
           if (lastAnnotation && lastAnnotation[0] === 'path' && model.mode === 'FREEDRAW'){
             lastAnnotation[1].d += ` L${action.x} ${action.y}`;
@@ -259,11 +310,32 @@ const reactToGeneralAction = (model) =>
             lastAnnotation[1].y = `${action.y}`;
           }
         }
+
+        if (model.mode === 'SELECT') {
+          if (!model.selection) {
+            break;
+          }
+          let first_point = model.selection[1].start;
+          let third_point = {'x':action.x,'y':action.y};
+          model.selection[1].points = [first_point,
+                                      {'x':first_point.x ,'y':third_point.y},
+                                      third_point,
+                                      {'x':third_point.x ,'y':first_point.y}]
+          model.selection[1].d = createSvgFromPoints(model.selection[1].points);
+          model.selection[1].d += ` Z`;
+        }
         break;
       
       case 'ANNOTATIONS_RESET':
         model.activityInProgress = false;
         model.annotations = action.annotations || [];
+
+        break;
+      
+      case 'SELECTION_RESET':
+        model.activityInProgress = false;
+        model.selection = null;
+
         break;
 
       case 'ZOOM_UPDATE':

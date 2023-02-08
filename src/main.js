@@ -1,9 +1,9 @@
 import { Rect } from 'OpenSeadragon';
 import { h, render } from 'preact';
 import Overlay from './views/Overlay';
-import { DeleteBinControl, DrawFreeControl, DrawPolyControl, DrawRectControl, EditBrushControl, MoveControl } from './views/Controls';
+import { DeleteBinControl, DrawFreeControl, DrawPolyControl, DrawRectControl, EditBrushControl, MoveControl, SelectControl } from './views/Controls';
 import createDispatcher from './model/createDispatcher';
-import generalActions from './model/generalActions';
+import actionsStore from './actions'
 import createModel from './model/createModel';
 
 const annotationsPrototype = {
@@ -47,6 +47,7 @@ const annotationsPrototype = {
 
     this.controls = [
       new MoveControl(controlConfig),
+      new SelectControl(controlConfig),
       new DrawPolyControl(controlConfig),
       new DrawFreeControl(controlConfig),
       new DrawRectControl(controlConfig),
@@ -68,7 +69,7 @@ const annotationsPrototype = {
   */
   addLayer(layerName) {
     const model = createModel();
-    this.dispatch = createDispatcher(model, generalActions);
+    this.dispatch = createDispatcher(model, actionsStore);
 
     this.overlays[layerName] = {
       model: model,
@@ -79,7 +80,7 @@ const annotationsPrototype = {
   },
 
   setLayer(layerName, resetControls=true) {
-    this.dispatch = createDispatcher(this.overlays[layerName].model, generalActions);
+    this.dispatch = createDispatcher(this.overlays[layerName].model, actionsStore);
     this.onOpen(layerName, resetControls);
   },
 
@@ -124,7 +125,16 @@ const annotationsPrototype = {
 
   getAnnotations() {
     const activeLayer = this.activeLayer;
-    return this.overlays[activeLayer].model.getAll();
+    return this.overlays[activeLayer].model.annotations;
+  },
+
+  getSelection() {
+    const activeLayer = this.activeLayer;
+    return this.overlays[activeLayer].model.selection;
+  },
+
+  cleanSelection() {
+    this.dispatch({ type: 'SELECTION_RESET', annotations })
   },
 
   setAnnotations(annotations) {
@@ -247,7 +257,7 @@ export default ({ viewer }) => {
   // Initialise default model
   const model = createModel();
   // Create global dispatcher linked to default model
-  const dispatch = createDispatcher(model, generalActions);
+  const dispatch = createDispatcher(model, actionsStore);
   const overlays = {
     'default': {
       model: model,

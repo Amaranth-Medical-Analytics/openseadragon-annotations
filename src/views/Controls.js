@@ -40,12 +40,17 @@ import moveHover from '../../img/move_hover.png';
 import movePressed from '../../img/move_pressed.png';
 import moveRest from '../../img/move_rest.png';
 
+import selectGroupHover from '../../img/select_grouphover.png';
+import selectHover from '../../img/select_hover.png';
+import selectPressed from '../../img/select_pressed.png';
+import selectRest from '../../img/select_rest.png';
+
 export class Control {
   constructor(options) {
     this.dispatch = options.dispatch;
     this.model = options.model;
     this.viewer = options.viewer;
-    this.mode = options.Tooltip.toUpperCase();
+    this.mode = options.tooltip.toUpperCase();
     this.btn = new Button(extend({
       onClick: (e) => { this.onClick(e); },
     }, options));
@@ -82,8 +87,8 @@ export class Control {
   }
 
   onClick({ eventSource }) {
-    if (eventSource.Tooltip) {
-      const mode = eventSource.Tooltip.toUpperCase();
+    if (eventSource.tooltip) {
+      const mode = eventSource.tooltip.toUpperCase();
       
       if (this.btn.element.disabled === true) {
         return;
@@ -98,7 +103,7 @@ export class Control {
 export class DrawLineControl extends Control {
   constructor(options) {
     super({
-      Tooltip: 'LineDraw',
+      tooltip: 'LineDraw',
       srcRest: drawlineRest,
       srcGroup: drawlineGroupHover,
       srcHover: drawlineHover,
@@ -111,7 +116,7 @@ export class DrawLineControl extends Control {
 export class DrawPolyControl extends Control {
   constructor(options) {
     super({
-      Tooltip: 'PolyDraw',
+      tooltip: 'PolyDraw',
       srcRest: drawPolyRest,
       srcGroup: drawPolyGroupHover,
       srcHover: drawPolyHover,
@@ -124,7 +129,7 @@ export class DrawPolyControl extends Control {
 export class DrawRectControl extends Control {
   constructor(options) {
     super({
-      Tooltip: 'Rectangle',
+      tooltip: 'Rectangle',
       srcRest: drawRectRest,
       srcGroup: drawRectGroupHover,
       srcHover: drawRectHover,
@@ -137,7 +142,7 @@ export class DrawRectControl extends Control {
 export class DrawFreeControl extends Control {
   constructor(options) {
     super({
-      Tooltip: 'FreeDraw',
+      tooltip: 'FreeDraw',
       srcRest: drawfreeRest,
       srcGroup: drawfreeGroupHover,
       srcHover: drawfreeHover,
@@ -150,7 +155,7 @@ export class DrawFreeControl extends Control {
 export class EditBrushControl extends Control {
   constructor(options) {
     super({
-      Tooltip: 'EditBrush',
+      tooltip: 'EditBrush',
       srcRest: editBrushRest,
       srcGroup: editBrushGroupHover,
       srcHover: editBrushHover,
@@ -163,7 +168,7 @@ export class EditBrushControl extends Control {
 export class DeleteBinControl extends Control {
   constructor(options) {
     super({
-      Tooltip: 'DeleteBin',
+      tooltip: 'DeleteBin',
       srcRest: deleteBinRest,
       srcGroup: deleteBinGroupHover,
       srcHover: deleteBinHover,
@@ -176,7 +181,7 @@ export class DeleteBinControl extends Control {
 export class TextControl extends Control {
   constructor(options) {
     super({
-      Tooltip: 'Text',
+      tooltip: 'Text',
       srcRest: textRest,
       srcGroup: textGroupHover,
       srcHover: textHover,
@@ -189,11 +194,24 @@ export class TextControl extends Control {
 export class MoveControl extends Control {
   constructor(options) {
     super({
-      Tooltip: 'Move',
+      tooltip: 'Move',
       srcRest: moveRest,
       srcGroup: moveGroupHover,
       srcHover: moveHover,
       srcDown: movePressed,
+      ...options,
+    });
+  }
+}
+
+export class SelectControl extends Control {
+  constructor(options) {
+    super({
+      tooltip: 'Select',
+      srcRest: selectRest,
+      srcGroup: selectGroupHover,
+      srcHover: selectHover,
+      srcDown: selectPressed,
       ...options,
     });
   }
